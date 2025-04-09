@@ -1,7 +1,6 @@
-from symbiosis_api_client import SymbiosisClient
-
-
 import pytest
+
+from symbiosis_api_client import SymbiosisClient
 
 
 @pytest.fixture

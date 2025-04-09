@@ -35,3 +35,6 @@ build:
 
 publish:
 	uv publish
+
+tox:
+	tox -e py39,py310,py311,py312,py313,lint

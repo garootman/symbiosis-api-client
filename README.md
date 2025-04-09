@@ -13,7 +13,7 @@ Python client for [Symbiosis Finance](https://symbiosis.finance/) REST API
 - [ ] Pydantic models
 - [ ] Enums
 - [ ] Exception Codes
-- [ ] Ton for Python versions
+- [X] tox for Python versions
 
 
 
