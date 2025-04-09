@@ -1,0 +1,79 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "symbiosis-api-client"
+dynamic = ["version"]
+description = 'Python client for api.symbiosis.finance'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "garootman", email = "dksg87@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "requests>=2.32.3",
+]
+
+[project.urls]
+Documentation = "https://github.com/garootman/symbiosis-api-client#readme"
+Issues = "https://github.com/garootman/symbiosis-api-client/issues"
+Source = "https://github.com/garootman/symbiosis-api-client"
+
+[tool.hatch.version]
+path = "src/symbiosis_api_client/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+
+
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/symbiosis_api_client tests}"
+
+[tool.coverage.run]
+source_pkgs = ["symbiosis_api_client", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/symbiosis_api_client/__about__.py",
+]
+
+[tool.coverage.paths]
+symbiosis_api_client = ["src/symbiosis_api_client", "*/symbiosis-api-client/src/symbiosis_api_client"]
+tests = ["tests", "*/symbiosis-api-client/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.4",
+    "sphinx>=7.1.2",
+    "twine>=6.1.0",
+]
+
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
