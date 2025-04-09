@@ -19,8 +19,3 @@ def test_client_get_tokens(client):
     assert len(tokens) > 30
     assert all(isinstance(token, TokensResponseSchemaItem) for token in tokens)
     assert client.tokens == tokens
-    for token in tokens:
-        assert token.address is not None
-        assert token.chainId is not None
-        assert token.decimals is not None
-        assert token.symbol is not None

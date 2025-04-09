@@ -1,7 +1,8 @@
-import httpx
-from . import models as models
 import logging
 
+import httpx
+
+from . import models as models
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class SymbiosisClient:
         )
         self.chains: list = []
         self.tokens: list = []
+        self.direct_routes: list = []
 
     def close(self):
         """Close the HTTP client."""
@@ -87,6 +89,31 @@ class SymbiosisClient:
         logger.info(f"Fetched {len(tokens_list)} tokens.")
         self.tokens = tokens_list
         return tokens_list
+
+    def get_direct_routes(self) -> list:
+        # get direct routes from the API
+        response = self.client.get(self.base_url + "/v1/direct-routes")
+        if not response.is_success:
+            msg = (
+                f"Error fetching direct routes: {response.status_code}, {response.text}"
+            )
+            logger.error(msg)
+            return []
+        routes = response.json()
+        if not routes:
+            logger.error("Routes list is empty.")
+            return []
+        if not isinstance(routes, list):
+            logger.error("Routes list is not a list.")
+            return []
+        routes_list = []
+        for route in routes:
+            route_model = models.DirectRoutesResponseItem(**route)
+            routes_list.append(route_model)
+
+        self.direct_routes = routes_list
+        logger.info(f"Fetched {len(routes_list)} direct routes.")
+        return routes_list
 
 
 """

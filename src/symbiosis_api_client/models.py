@@ -16,3 +16,10 @@ class TokensResponseSchemaItem(BaseModel):
     address: str
     chainId: int
     decimals: int
+
+
+class DirectRoutesResponseItem(BaseModel):
+    originChainId: float
+    originToken: str
+    destinationChainId: float
+    destinationToken: str
