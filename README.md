@@ -13,6 +13,7 @@ Python client for [Symbiosis Finance](https://symbiosis.finance/) REST API
 - [ ] Pydantic models
 - [ ] Enums
 - [ ] Exception Codes
+- [ ] Testnet – when there are tokens available on Symbiosis
 - [X] tox for Python versions
 
 

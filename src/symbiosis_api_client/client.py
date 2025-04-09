@@ -67,6 +67,28 @@ class SymbiosisClient:
         self.chains = chains
         return chains
 
+    def get_tokens(self) -> list[models.TokensResponseSchemaItem]:
+        response = self.client.get(self.base_url + "v1/tokens")
+
+        if not response.is_success:
+            msg = f"Error fetching tokens: {response.status_code}, {response.text}"
+            logger.error(msg)
+            return []
+        tokens = response.json()
+        if not tokens:
+            logger.error("Tokens list is empty.")
+            return []
+        if not isinstance(tokens, list):
+            logger.error("Tokens list is not a list.")
+            return []
+        tokens_list = []
+        for token in tokens:
+            token_model = models.TokensResponseSchemaItem(**token)
+            tokens_list.append(token_model)
+        logger.info(f"Fetched {len(tokens_list)} tokens.")
+        self.tokens = tokens_list
+        return tokens_list
+
 
 """
     def get_swap_limits(self) -> dict:
@@ -85,16 +107,6 @@ class SymbiosisClient:
         }
         return limit_dict
 
-    def _load_tokens(self):
-        endpoint = "v1/tokens"
-        with httpx.Client() as client:
-            response = client.get(self.base_url + endpoint)
-        if not response.is_success:
-            msg = f"Error fetching tokens: {response.status_code}, {response.text}"
-            logger.error(msg)
-            return {}
-        tokens = response.json()
-        return tokens
 
     def __swap_tokens(
         self,

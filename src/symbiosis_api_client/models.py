@@ -1,4 +1,6 @@
-from pydantic import BaseModel  # , Field
+from pydantic import BaseModel
+
+# from typing import Any ,Optional
 
 
 class ChainsResponseSchemaItem(BaseModel):
@@ -6,3 +8,11 @@ class ChainsResponseSchemaItem(BaseModel):
     name: str
     explorer: str
     icon: str
+
+
+class TokensResponseSchemaItem(BaseModel):
+    symbol: str
+    icon: str
+    address: str
+    chainId: int
+    decimals: int

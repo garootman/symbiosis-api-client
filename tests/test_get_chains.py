@@ -21,6 +21,7 @@ def testnet_client():
 def test_client_get_chains(mainnet_client):
     client = mainnet_client
     assert client.health_check() is True
+    assert client.chains == []
     chains = client.get_chains()
     assert isinstance(chains, list)
     assert len(chains) > 30
