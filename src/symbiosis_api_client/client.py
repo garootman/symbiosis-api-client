@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import httpx
 
@@ -21,6 +22,8 @@ class SymbiosisClient:
         self.chains: list = []
         self.tokens: list = []
         self.direct_routes: list = []
+        self.fees: list = []
+        self.fees_updated_at: int = 0
 
     def close(self):
         """Close the HTTP client."""
@@ -31,6 +34,10 @@ class SymbiosisClient:
         # if self.testnet:
         #    return "https://api.testnet.symbiosis.finance/crosschain/"
         return "https://api.symbiosis.finance/crosschain/"
+
+    @property
+    def fees_age_seconds(self) -> int:
+        return int(datetime.now().timestamp()) - self.fees_updated_at
 
     def health_check(self, raise_exception: bool = False) -> bool:
         # use self.client to check the health of the API
@@ -114,6 +121,33 @@ class SymbiosisClient:
         self.direct_routes = routes_list
         logger.info(f"Fetched {len(routes_list)} direct routes.")
         return routes_list
+
+    def get_fees(self) -> list:
+        response = self.client.get(self.base_url + "/v1/fees")
+        if not response.is_success:
+            msg = f"Error fetching fees: {response.status_code}, {response.text}"
+            logger.error(msg)
+            return []
+        fees = response.json()
+        if not fees:
+            logger.error("Fees object is empty.")
+            return []
+        fees_list = fees.get("fees", [])
+        if not fees_list:
+            logger.error("Fees list is empty.")
+            return []
+        if not isinstance(fees_list, list):
+            logger.error("Fees list is not a list.")
+            return []
+        save_list = []
+        for fee in fees_list:
+            fee_model = models.FeesResponseItem(**fee)
+            save_list.append(fee_model)
+        self.fees_updated_at = int(fees.get("updatedAt", 0)) // 1000
+        self.fees = save_list
+        logger.info(f"Fetched {len(save_list)} fees.")
+        # convert to pydantic model of FeesResponseSchema
+        return save_list
 
 
 """

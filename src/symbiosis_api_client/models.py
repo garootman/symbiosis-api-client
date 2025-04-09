@@ -1,6 +1,16 @@
-from pydantic import BaseModel
+import logging
+from decimal import Decimal
 
-# from typing import Any ,Optional
+from pydantic import BaseModel, field_validator
+
+logger = logging.getLogger(__name__)
+
+
+def to_number(value) -> Decimal | None:
+    try:
+        return Decimal(str(value))
+    except Exception:
+        return None
 
 
 class ChainsResponseSchemaItem(BaseModel):
@@ -23,3 +33,19 @@ class DirectRoutesResponseItem(BaseModel):
     originToken: str
     destinationChainId: float
     destinationToken: str
+
+
+class FeesResponseItem(BaseModel):
+    chainId: int
+    address: str
+    symbol: str
+    decimals: int
+    value: int
+
+    @field_validator("value", mode="before")
+    @classmethod
+    def check_value(cls, v):
+        num = to_number(v)
+        if num is None:
+            raise ValueError(f"Value {v} is not a number")
+        return int(num)
