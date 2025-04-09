@@ -1,25 +1,27 @@
 import pytest
 
-from symbiosis_api_client import SymbiosisClient
-from symbiosis_api_client.models import StuckedResponseItem
+from symbiosis_api_client import SymbiosisClient, models
 
 
 @pytest.fixture
 def client():
     clnt = SymbiosisClient()
+    assert clnt.health_check() is True
     yield clnt
     clnt.close()
 
 
 @pytest.fixture
 def stuck_address():
-    # Replace with a valid address for testing
-    return "0x1234567890abcdef1234567890abcdef12345678"
+    stuck_req = models.StuckedRequestSchema(
+        address="0x1234567890abcdef1234567890abcdef12345678"
+    )
+    return stuck_req
 
 
 def test_get_stucked(client, stuck_address):
-    assert client.health_check() is True
     struck = client.get_stucked(stuck_address)
-    assert isinstance(struck, list)
-    assert all(isinstance(item, StuckedResponseItem) for item in struck)
-    # assert len(struck) > 0 # TODO: test when there is some stucked item
+    assert isinstance(struck, models.StuckedResponseSchema)
+    assert isinstance(struck.root, list)
+    # assert len(struck.root) > 0  # TODO: test when there is some stucked item
+    assert all(isinstance(item, models.StuckedResponseItem) for item in struck.root)

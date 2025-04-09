@@ -1,10 +1,9 @@
 import logging
-from datetime import datetime
 
 import httpx
 
+# from . import models as models
 from . import models as models
-from .model_list_adapter import TypeAdapter, list_adapter
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +19,6 @@ class SymbiosisClient:
                 "Content-Type": "application/json",
             },
         )
-        self.chains: list = []
-        self.tokens: list = []
-        self.direct_routes: list = []
-        self.fees: list = []
-        self.fees_updated_at: int = 0
-        self.swap_limits: list = []
 
     def close(self):
         """Close the HTTP client."""
@@ -37,14 +30,10 @@ class SymbiosisClient:
         #    return "https://api.testnet.symbiosis.finance/crosschain/"
         return "https://api.symbiosis.finance/crosschain/"
 
-    @property
-    def fees_age_seconds(self) -> int:
-        return int(datetime.now().timestamp()) - self.fees_updated_at
-
     def health_check(self, raise_exception: bool = False) -> bool:
         # use self.client to check the health of the API
         response = self.client.get(self.base_url + "health-check")
-        if response.status_code == 200:
+        if response.is_success:
             logger.info("Symbiosis API is healthy.")
             return True
         else:
@@ -53,96 +42,62 @@ class SymbiosisClient:
             )
             logger.error(msg)
             if raise_exception:
-                raise Exception(msg)
+                response.raise_for_status()
             return False
 
-    def get_chains(self) -> list[models.ChainsResponseItem]:
+    def __get_raise_validate(
+        self, url: str, model: models.BaseModel
+    ) -> models.BaseModel:
+        """Generic method to get data from the API and validate it against a model."""
+        response = self.client.get(url)
+        response.raise_for_status()
+        return model.model_validate(response.json())
+
+    def get_chains(self) -> models.ChainsResponseSchema:
         """Returns the chains available for swapping."""
         response = self.client.get(self.base_url + "v1/chains")
-        if not response.is_success:
-            msg = f"Error fetching chains: {response.status_code}, {response.text}"
-            logger.error(msg)
-            return []
-        self.chains = list_adapter(response.json(), models.ChainsResponseItem)
-        logger.info(f"Fetched {len(self.chains)} chains.")
-        return self.chains
+        response.raise_for_status()
+        return models.ChainsResponseSchema.model_validate(response.json())
 
-    def get_tokens(self) -> list[models.TokensResponseItem]:
+    def get_tokens(self) -> models.TokensResponseSchema:
         """Returns the tokens available for swapping."""
-
         response = self.client.get(self.base_url + "v1/tokens")
-        if not response.is_success:
-            msg = f"Error fetching tokens: {response.status_code}, {response.text}"
-            logger.error(msg)
-            return []
-        self.tokens = list_adapter(response.json(), models.TokensResponseItem)
-        logger.info(f"Fetched {len(self.tokens)} tokens.")
-        return self.tokens
+        response.raise_for_status()
+        return models.TokensResponseSchema.model_validate(response.json())
 
     def get_direct_routes(self) -> list[models.DirectRoutesResponseItem]:
         """Returns the direct routes for all tokens."""
-
         response = self.client.get(self.base_url + "/v1/direct-routes")
-        if not response.is_success:
-            msg = f"Error fetching routes: {response.status_code}, {response.text}"
-            logger.error(msg)
-            return []
-        self.direct_routes = list_adapter(
-            response.json(), models.DirectRoutesResponseItem
-        )
-        logger.info(f"Fetched {len(self.direct_routes)} direct routes.")
-        return self.direct_routes
+        response.raise_for_status()
+        return models.DirectRoutesResponse.model_validate(response.json())
 
-    def get_fees(self) -> list[models.FeesResponseItem]:
+    def get_fees(self) -> models.FeesResponseSchema:
         """Returns the current fees for all tokens."""
-
         response = self.client.get(self.base_url + "/v1/fees")
-        if not response.is_success:
-            msg = f"Error fetching fees: {response.status_code}, {response.text}"
-            logger.error(msg)
-            return []
-        self.fees = list_adapter(
-            response.json().get("fees", []), models.FeesResponseItem
-        )
-        self.fees_updated_at = int(response.json().get("updatedAt", 0)) // 1000
-        logger.info(f"Fetched {len(self.fees)} fees.")
-        return self.fees
+        response.raise_for_status()
+        return models.FeesResponseSchema.model_validate(response.json())
 
-    def get_swap_limits(self) -> list[models.SwapLimitsResponseItem]:
+    def get_swap_limits(self) -> models.SwapLimitsResponseSchema:
         """Returns the swap limits for all tokens."""
-
         response = self.client.get(self.base_url + "/v1/swap-limits")
-        if not response.is_success:
-            msg = f"Error fetching swap limits: {response.status_code}, {response.text}"
-            logger.error(msg)
-            return []
-        self.swap_limits = list_adapter(response.json(), models.SwapLimitsResponseItem)
-        logger.info(f"Fetched {len(self.swap_limits)} swap limits.")
-        return self.swap_limits
+        response.raise_for_status()
+        return models.SwapLimitsResponseSchema.model_validate(response.json())
 
-    def get_stucked(self, address: str) -> list[models.StuckedResponseItem]:
+    def get_stucked(
+        self, payload: models.StuckedRequestSchema
+    ) -> models.StuckedResponseSchema:
         """Returns a list of stuck cross-chain operations associated with the specified address."""
-        response = self.client.get(self.base_url + f"/v1/stucked/{address}")
-        if not response.is_success:
-            msg = f"Error fetching stucked operations: {response.status_code}, {response.text}"
-            logger.error(msg)
-            return []
-        return list_adapter(response.json(), models.StuckedResponseItem)
+        response = self.client.get(self.base_url + f"/v1/stucked/{payload.address}")
+        response.raise_for_status()
+        return models.StuckedResponseSchema.model_validate(response.json())
 
-    def get_transaction(
-        self, chain_id: str, txhash: str
-    ) -> models.TxResponseSchema | None:
+    def get_transaction(self, payload: models.Tx12) -> models.TxResponseSchema:
         """Returns the operation by its transaction hash."""
-        response = self.client.get(self.base_url + f"/v1/tx/{chain_id}/{txhash}")
-        if not response.is_success:
-            msg = f"Error fetching transaction: {response.status_code}, {response.text}"
-            logger.error(msg)
-            return None
-        adapter = TypeAdapter(models.TxResponseSchema)
-        return adapter.validate_python(response.json())
-
-    def post_swap(self, payload: models.SwapRequestSchema) -> None:
-        return None
+        response = self.client.get(
+            self.base_url + f"/v1/tx/{payload.chainId}/{payload.transactionHash}"
+        )
+        response.raise_for_status()
+        return models.TxResponseSchema.model_validate(response.json())
 
 
 """

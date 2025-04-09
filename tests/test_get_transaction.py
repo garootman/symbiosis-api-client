@@ -2,8 +2,7 @@ import pytest
 
 # from dotenv import load_dotenv
 # load_dotenv()
-from symbiosis_api_client import SymbiosisClient
-from symbiosis_api_client.models import TxResponseSchema
+from symbiosis_api_client import SymbiosisClient, models
 
 
 @pytest.fixture
@@ -33,14 +32,19 @@ def txndata():
             "hash": "0x1e4037e0bcc6224b2a1c1af4f35e7d01a9909f04f39d49ce0ae06b8c1be87c6e",
         },
     ]
-
-    return txndata
+    txn_models = []
+    for tx in txndata:
+        txn_models.append(
+            models.Tx12(
+                chainId=tx["chain"],
+                transactionHash=tx["hash"],
+            )
+        )
+    return txn_models
 
 
 def test_get_transaction(client, txndata):
-    assert client.health_check() is True
-    _ = client.get_chains()
     for txn in txndata:
-        tnx_info = client.get_transaction(txn["chain"], txn["hash"])
-        assert isinstance(tnx_info, TxResponseSchema)
+        tnx_info = client.get_transaction(payload=txn)
+        assert isinstance(tnx_info, models.TxResponseSchema)
         assert tnx_info.status.text.lower() == "success"
