@@ -24,6 +24,7 @@ class SymbiosisClient:
         self.direct_routes: list = []
         self.fees: list = []
         self.fees_updated_at: int = 0
+        self.swap_limits: list = []
 
     def close(self):
         """Close the HTTP client."""
@@ -149,23 +150,28 @@ class SymbiosisClient:
         # convert to pydantic model of FeesResponseSchema
         return save_list
 
-
-"""
-    def get_swap_limits(self) -> dict:
-        # needed to verify minimum and maximum swap amounts
-        endpoint = "/v1/swap-limits"
-        url = "https://api.symbiosis.finance/crosschain" + endpoint
-        with httpx.Client() as client:
-            response = client.get(url)
+    def get_swap_limits(self):
+        response = self.client.get(self.base_url + "/v1/swap-limits")
         if not response.is_success:
             msg = f"Error fetching swap limits: {response.status_code}, {response.text}"
             logger.error(msg)
             return {}
         limit_list = response.json()
-        limit_dict = {
-            i["chainId"]: i for i in limit_list if i["chainId"] in self.chains.values()
-        }
-        return limit_dict
+        if not limit_list:
+            logger.error("Swap limits list is empty.")
+            return {}
+        if not isinstance(limit_list, list):
+            logger.error("Swap limits list is not a list.")
+            return {}
+        return_list = []
+        for limit in limit_list:
+            limit_model = models.SwapLimitsItem(**limit)
+            return_list.append(limit_model)
+        self.swap_limits = return_list
+        return return_list
+
+
+"""
 
 
     def __swap_tokens(
