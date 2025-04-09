@@ -32,9 +32,10 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/garootman/symbiosis-api-client#readme"
+Documentation = "https://symbiosis-api-client.readthedocs.io/en/latest/"
 Issues = "https://github.com/garootman/symbiosis-api-client/issues"
 Source = "https://github.com/garootman/symbiosis-api-client"
+
 
 [tool.hatch.version]
 path = "src/symbiosis_api_client/__about__.py"
@@ -69,6 +70,10 @@ exclude_lines = [
 
 [dependency-groups]
 dev = [
+    "bandit>=1.7.10",
+    "black>=24.8.0",
+    "mypy>=1.14.1",
+    "pre-commit>=3.5.0",
     "ruff>=0.11.4",
     "sphinx>=7.1.2",
     "twine>=6.1.0",
