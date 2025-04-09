@@ -73,3 +73,10 @@ class SwapLimitsItem(BaseModel):
         if num is None:
             raise ValueError(f"Max {v} is not a number")
         return int(num)
+
+
+class StuckedItem(BaseModel):
+    hash: str
+    chainId: float
+    createdAt: str
+    tokenAmount: str  # TokenAmount

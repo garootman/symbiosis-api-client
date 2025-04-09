@@ -170,6 +170,20 @@ class SymbiosisClient:
         self.swap_limits = return_list
         return return_list
 
+    def get_stucked(self, address: str):
+        """Returns a list of stuck cross-chain operations associated with the specified address."""
+        response = self.client.get(self.base_url + f"/v1/stucked/{address}")
+        if not response.is_success:
+            msg = f"Error fetching stucked operations: {response.status_code}, {response.text}"
+            logger.error(msg)
+            return []
+        stucked_list = response.json()
+        return_list = []
+        for item in stucked_list:
+            item_model = models.StuckedItem(**item)
+            return_list.append(item_model)
+        return stucked_list
+
 
 """
 

@@ -8,13 +8,14 @@ Python client for [Symbiosis Finance](https://symbiosis.finance/) REST API
 ## ToDo Plan:
 
 - [ ] Main functionality
+- [ ] Test Stuck transactions functionality
 - [ ] Throttling + Singleton
 - [ ] Acync support
-- [ ] Pydantic models
 - [ ] Enums
 - [ ] Exception Codes
 - [ ] Testnet – when there are tokens available on Symbiosis
 - [X] tox for Python versions
+- [X] Pydantic models
 
 
 
