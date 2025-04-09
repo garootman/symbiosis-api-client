@@ -1,10 +1,21 @@
 {
-    "python.analysis.extraPaths": [
-        "src"
-    ],
-    "python.testing.pytestEnabled": true,
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestArgs": [
-        "tests"
-    ]
+  "python.analysis.extraPaths": [
+    "src"
+  ],
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ruff"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "ruff"
+  }
 }
