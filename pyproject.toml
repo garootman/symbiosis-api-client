@@ -27,7 +27,8 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-    "requests>=2.32.3",
+    "httpx>=0.28.1",
+    "pydantic>=2.10.6",
     "sphinx>=7.1.2",
 ]
 
@@ -74,6 +75,7 @@ dev = [
     "black>=24.8.0",
     "mypy>=1.14.1",
     "pre-commit>=3.5.0",
+    "pytest>=8.3.5",
     "ruff>=0.11.4",
     "sphinx>=7.1.2",
     "twine>=6.1.0",

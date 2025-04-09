@@ -28,7 +28,7 @@ clean:
 
 # Run tests using pytest
 test:
-	pytest
+	PYTHONPATH=src pytest
 
 build:
 	uv build
