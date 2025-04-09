@@ -1,10 +1,28 @@
 # symbiosis-client-py
 
-Python client for api.symbiosis.finance
+> [!IMPORTANT]
+> WORK IN PROGRESS, DO NOT USE!
 
-[JS SDK Source code](https://github.com/symbiosis-finance/js-sdk)
-[Swagger](https://api.symbiosis.finance/crosschain/docs/)
-[Source Docs](https://docs.symbiosis.finance/developer-tools/symbiosis-api)
+Python client for [Symbiosis Finance](https://symbiosis.finance/) REST API
+
+## ToDo Plan:
+
+- [ ] Main functionality
+- [ ] Throttling + Singleton
+- [ ] Acync support
+- [ ] Pydantic models
+- [ ] Enums
+- [ ] Exception Codes
+- [ ] Ton for Python versions
+
+
+
+### Sources:
+
+- [Swagger](https://api.symbiosis.finance/crosschain/docs/)
+- [Source Docs](https://docs.symbiosis.finance/developer-tools/symbiosis-api)
+- [JS SDK Source code for reference](https://github.com/symbiosis-finance/js-sdk)
+
 
 
 # symbiosis-api-client
