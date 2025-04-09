@@ -1,9 +1,11 @@
 import logging
 from decimal import Decimal
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 logger = logging.getLogger(__name__)
+
+"(^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$)*(^0x[a-fA-F0-9]{40}$)*"
 
 
 def to_number(value) -> Decimal | None:
@@ -144,3 +146,37 @@ class TxResponseSchema(BaseModel):
     tx: Tx11 | None = None
     txIn: TxIn | None = None
     transitTokenSent: TransitTokenSent | None = None
+
+
+class TokenOut(BaseModel):
+    address: str
+    chainId: int
+    chainIdFrom: int | None = None
+    decimals: int
+    symbol: str | None = None
+    icon: str | None = None
+
+
+class MiddlewareCall(BaseModel):
+    address: str
+    data: str
+    offset: float
+
+
+class RevertableAddress(BaseModel):
+    chainId: int
+    address: str
+
+
+class SwapRequestSchema(BaseModel):
+    tokenAmountIn: TokenAmount
+    tokenOut: TokenOut
+    from_: str = Field(..., alias="from")
+
+    to: str
+    slippage: int
+    middlewareCall: MiddlewareCall | None = None
+    revertableAddresses: list[RevertableAddress] | None = None
+    selectMode: str | None = None
+    partnerAddress: str | None = None
+    refundAddress: str | None = None

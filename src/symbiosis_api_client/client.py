@@ -141,6 +141,9 @@ class SymbiosisClient:
         adapter = TypeAdapter(models.TxResponseSchema)
         return adapter.validate_python(response.json())
 
+    def post_swap(self, payload: models.SwapRequestSchema) -> None:
+        return None
+
 
 """
 
