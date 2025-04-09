@@ -4,6 +4,7 @@ from datetime import datetime
 import httpx
 
 from . import models as models
+from .model_list_adapter import TypeAdapter, list_adapter
 
 logger = logging.getLogger(__name__)
 
@@ -47,142 +48,98 @@ class SymbiosisClient:
             logger.info("Symbiosis API is healthy.")
             return True
         else:
-            logger.error(
-                f"Symbiosis API is not healthy. Status code: {response.status_code}"
+            msg = (
+                f"Symbiosis API is not healthy.{response.status_code} - {response.text}"
             )
+            logger.error(msg)
             if raise_exception:
-                raise Exception("Symbiosis API is not healthy.")
+                raise Exception(msg)
             return False
 
-    def get_chains(self) -> list[models.ChainsResponseSchemaItem]:
+    def get_chains(self) -> list[models.ChainsResponseItem]:
+        """Returns the chains available for swapping."""
         response = self.client.get(self.base_url + "v1/chains")
         if not response.is_success:
             msg = f"Error fetching chains: {response.status_code}, {response.text}"
             logger.error(msg)
             return []
-        # convert to pydantic model of ChainsResponseSchema
-        chains = []
-        chains_list = response.json()
-        if not chains_list:
-            logger.error("Chains list is empty.")
-            return []
-        if not isinstance(chains_list, list):
-            logger.error("Chains list is not a list.")
-            return []
-        for chain in response.json():
-            chain_model = models.ChainsResponseSchemaItem(**chain)
-            chains.append(chain_model)
-        logger.info(f"Fetched {len(chains)} chains.")
-        self.chains = chains
-        return chains
+        self.chains = list_adapter(response.json(), models.ChainsResponseItem)
+        logger.info(f"Fetched {len(self.chains)} chains.")
+        return self.chains
 
-    def get_tokens(self) -> list[models.TokensResponseSchemaItem]:
+    def get_tokens(self) -> list[models.TokensResponseItem]:
+        """Returns the tokens available for swapping."""
+
         response = self.client.get(self.base_url + "v1/tokens")
-
         if not response.is_success:
             msg = f"Error fetching tokens: {response.status_code}, {response.text}"
             logger.error(msg)
             return []
-        tokens = response.json()
-        if not tokens:
-            logger.error("Tokens list is empty.")
-            return []
-        if not isinstance(tokens, list):
-            logger.error("Tokens list is not a list.")
-            return []
-        tokens_list = []
-        for token in tokens:
-            token_model = models.TokensResponseSchemaItem(**token)
-            tokens_list.append(token_model)
-        logger.info(f"Fetched {len(tokens_list)} tokens.")
-        self.tokens = tokens_list
-        return tokens_list
+        self.tokens = list_adapter(response.json(), models.TokensResponseItem)
+        logger.info(f"Fetched {len(self.tokens)} tokens.")
+        return self.tokens
 
-    def get_direct_routes(self) -> list:
-        # get direct routes from the API
+    def get_direct_routes(self) -> list[models.DirectRoutesResponseItem]:
+        """Returns the direct routes for all tokens."""
+
         response = self.client.get(self.base_url + "/v1/direct-routes")
         if not response.is_success:
-            msg = (
-                f"Error fetching direct routes: {response.status_code}, {response.text}"
-            )
+            msg = f"Error fetching routes: {response.status_code}, {response.text}"
             logger.error(msg)
             return []
-        routes = response.json()
-        if not routes:
-            logger.error("Routes list is empty.")
-            return []
-        if not isinstance(routes, list):
-            logger.error("Routes list is not a list.")
-            return []
-        routes_list = []
-        for route in routes:
-            route_model = models.DirectRoutesResponseItem(**route)
-            routes_list.append(route_model)
+        self.direct_routes = list_adapter(
+            response.json(), models.DirectRoutesResponseItem
+        )
+        logger.info(f"Fetched {len(self.direct_routes)} direct routes.")
+        return self.direct_routes
 
-        self.direct_routes = routes_list
-        logger.info(f"Fetched {len(routes_list)} direct routes.")
-        return routes_list
+    def get_fees(self) -> list[models.FeesResponseItem]:
+        """Returns the current fees for all tokens."""
 
-    def get_fees(self) -> list:
         response = self.client.get(self.base_url + "/v1/fees")
         if not response.is_success:
             msg = f"Error fetching fees: {response.status_code}, {response.text}"
             logger.error(msg)
             return []
-        fees = response.json()
-        if not fees:
-            logger.error("Fees object is empty.")
-            return []
-        fees_list = fees.get("fees", [])
-        if not fees_list:
-            logger.error("Fees list is empty.")
-            return []
-        if not isinstance(fees_list, list):
-            logger.error("Fees list is not a list.")
-            return []
-        save_list = []
-        for fee in fees_list:
-            fee_model = models.FeesResponseItem(**fee)
-            save_list.append(fee_model)
-        self.fees_updated_at = int(fees.get("updatedAt", 0)) // 1000
-        self.fees = save_list
-        logger.info(f"Fetched {len(save_list)} fees.")
-        # convert to pydantic model of FeesResponseSchema
-        return save_list
+        self.fees = list_adapter(
+            response.json().get("fees", []), models.FeesResponseItem
+        )
+        self.fees_updated_at = int(response.json().get("updatedAt", 0)) // 1000
+        logger.info(f"Fetched {len(self.fees)} fees.")
+        return self.fees
 
-    def get_swap_limits(self):
+    def get_swap_limits(self) -> list[models.SwapLimitsResponseItem]:
+        """Returns the swap limits for all tokens."""
+
         response = self.client.get(self.base_url + "/v1/swap-limits")
         if not response.is_success:
             msg = f"Error fetching swap limits: {response.status_code}, {response.text}"
             logger.error(msg)
-            return {}
-        limit_list = response.json()
-        if not limit_list:
-            logger.error("Swap limits list is empty.")
-            return {}
-        if not isinstance(limit_list, list):
-            logger.error("Swap limits list is not a list.")
-            return {}
-        return_list = []
-        for limit in limit_list:
-            limit_model = models.SwapLimitsItem(**limit)
-            return_list.append(limit_model)
-        self.swap_limits = return_list
-        return return_list
+            return []
+        self.swap_limits = list_adapter(response.json(), models.SwapLimitsResponseItem)
+        logger.info(f"Fetched {len(self.swap_limits)} swap limits.")
+        return self.swap_limits
 
-    def get_stucked(self, address: str):
+    def get_stucked(self, address: str) -> list[models.StuckedResponseItem]:
         """Returns a list of stuck cross-chain operations associated with the specified address."""
         response = self.client.get(self.base_url + f"/v1/stucked/{address}")
         if not response.is_success:
             msg = f"Error fetching stucked operations: {response.status_code}, {response.text}"
             logger.error(msg)
             return []
-        stucked_list = response.json()
-        return_list = []
-        for item in stucked_list:
-            item_model = models.StuckedItem(**item)
-            return_list.append(item_model)
-        return stucked_list
+        return list_adapter(response.json(), models.StuckedResponseItem)
+
+    def get_transaction(
+        self, chain_id: str, txhash: str
+    ) -> models.TxResponseSchema | None:
+        """Returns the operation by its transaction hash."""
+        response = self.client.get(self.base_url + f"/v1/tx/{chain_id}/{txhash}")
+        if not response.is_success:
+            msg = f"Error fetching transaction: {response.status_code}, {response.text}"
+            logger.error(msg)
+            return None
+        adapter = TypeAdapter(models.TxResponseSchema)
+        return adapter.validate_python(response.json())
 
 
 """

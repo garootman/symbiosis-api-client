@@ -1,7 +1,7 @@
 import pytest
 
 from symbiosis_api_client import SymbiosisClient
-from symbiosis_api_client.models import SwapLimitsItem
+from symbiosis_api_client.models import SwapLimitsResponseItem
 
 
 @pytest.fixture
@@ -18,4 +18,4 @@ def test_client_get_chains(client):
     assert isinstance(limits, list)
     assert len(limits) > 100
     assert client.swap_limits == limits
-    assert all(isinstance(limit, SwapLimitsItem) for limit in limits)
+    assert all(isinstance(limit, SwapLimitsResponseItem) for limit in limits)

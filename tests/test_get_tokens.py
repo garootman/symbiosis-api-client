@@ -1,7 +1,7 @@
 import pytest
 
 from symbiosis_api_client import SymbiosisClient
-from symbiosis_api_client.models import TokensResponseSchemaItem
+from symbiosis_api_client.models import TokensResponseItem
 
 
 @pytest.fixture
@@ -17,5 +17,5 @@ def test_client_get_tokens(client):
     tokens = client.get_tokens()
     assert isinstance(tokens, list)
     assert len(tokens) > 30
-    assert all(isinstance(token, TokensResponseSchemaItem) for token in tokens)
+    assert all(isinstance(token, TokensResponseItem) for token in tokens)
     assert client.tokens == tokens

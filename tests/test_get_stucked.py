@@ -1,7 +1,7 @@
 import pytest
 
 from symbiosis_api_client import SymbiosisClient
-from symbiosis_api_client.models import StuckedItem
+from symbiosis_api_client.models import StuckedResponseItem
 
 
 @pytest.fixture
@@ -21,5 +21,5 @@ def test_get_stucked(client, stuck_address):
     assert client.health_check() is True
     struck = client.get_stucked(stuck_address)
     assert isinstance(struck, list)
-    assert all(isinstance(item, StuckedItem) for item in struck)
+    assert all(isinstance(item, StuckedResponseItem) for item in struck)
     # assert len(struck) > 0 # TODO: test when there is some stucked item

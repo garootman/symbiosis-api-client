@@ -13,25 +13,25 @@ def to_number(value) -> Decimal | None:
         return None
 
 
-class ChainsResponseSchemaItem(BaseModel):
-    id: float
+class ChainsResponseItem(BaseModel):
+    id: int
     name: str
     explorer: str
-    icon: str
+    icon: str | None = None
 
 
-class TokensResponseSchemaItem(BaseModel):
+class TokensResponseItem(BaseModel):
     symbol: str
-    icon: str
+    icon: str | None = None
     address: str
     chainId: int
     decimals: int
 
 
 class DirectRoutesResponseItem(BaseModel):
-    originChainId: float
+    originChainId: int
     originToken: str
-    destinationChainId: float
+    destinationChainId: int
     destinationToken: str
 
 
@@ -51,7 +51,7 @@ class FeesResponseItem(BaseModel):
         return int(num)
 
 
-class SwapLimitsItem(BaseModel):
+class SwapLimitsResponseItem(BaseModel):
     chainId: int
     address: str
     min: int
@@ -75,8 +75,72 @@ class SwapLimitsItem(BaseModel):
         return int(num)
 
 
-class StuckedItem(BaseModel):
+class TokenAmount(BaseModel):
+    address: str
+    chainId: int
+    chainIdFrom: int | None = None
+    decimals: int
+    symbol: str
+    icon: str | None = None
+    amount: int
+
+    @field_validator("amount", mode="before")
+    @classmethod
+    def check_amount(cls, v):
+        num = to_number(v)
+        if num is None:
+            raise ValueError(f"Amount {v} is not a number")
+        return int(num)
+
+
+class StuckedResponseItem(BaseModel):
     hash: str
-    chainId: float
+    chainId: int
     createdAt: str
-    tokenAmount: str  # TokenAmount
+    tokenAmount: TokenAmount
+
+
+class Status(BaseModel):
+    code: float
+    text: str
+
+
+class Tx11(BaseModel):
+    hash: str
+    chainId: int
+    tokenAmount: TokenAmount | None = None
+    time: str
+    address: str
+
+
+class TxIn(BaseModel):
+    hash: str
+    chainId: int
+    tokenAmount: TokenAmount
+    time: str
+    address: str
+
+
+class TransitTokenSent(BaseModel):
+    address: str
+    chainId: int
+    chainIdFrom: int | None = None
+    decimals: int
+    symbol: str
+    icon: str | None = None
+    amount: int
+
+    @field_validator("amount", mode="before")
+    @classmethod
+    def check_amount(cls, v):
+        num = to_number(v)
+        if num is None:
+            raise ValueError(f"Amount {v} is not a number")
+        return int(num)
+
+
+class TxResponseSchema(BaseModel):
+    status: Status
+    tx: Tx11 | None = None
+    txIn: TxIn | None = None
+    transitTokenSent: TransitTokenSent | None = None
