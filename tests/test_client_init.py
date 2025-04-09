@@ -4,42 +4,25 @@ from symbiosis_api_client import SymbiosisClient
 
 
 @pytest.fixture
-def mainnet_client():
-    client = SymbiosisClient(testnet=False)
-    yield client
-    client.close()
-
-
-@pytest.fixture
-def testnet_client():
-    client = SymbiosisClient(testnet=True)
-    yield client
-    client.close()
+def client():
+    clnt = SymbiosisClient()
+    yield clnt
+    clnt.close()
 
 
 def test_client_init_mainnet():
-    client = SymbiosisClient(testnet=False)
-    assert client.testnet is False
+    client = SymbiosisClient()
     assert client.client.headers["accept"] == "application/json"
     assert client.client.headers["Content-Type"] == "application/json"
     client.close()
 
 
-def test_client_init_testnet():
-    client = SymbiosisClient(testnet=True)
-    assert client.testnet is True
-    assert client.client.headers["accept"] == "application/json"
-    assert client.client.headers["Content-Type"] == "application/json"
-    client.close()
-
-
-def test_client_health(mainnet_client):
-    client = mainnet_client
+def test_client_health(client):
     assert client.health_check() is True
     client.close()
 
 
-def test_client_health_testnet(testnet_client):
-    client = testnet_client
+def test_bad_request(client):
     assert client.health_check() is True
-    client.close()
+    req = client.client.get(client.base_url + "v1/bad_request")
+    assert req.status_code == 404

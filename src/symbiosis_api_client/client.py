@@ -7,9 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 class SymbiosisClient:
-    def __init__(self, testnet: bool = False, timeout: float = 10.0) -> None:
+    def __init__(self, timeout: float = 10.0) -> None:
         """Initialize the SymbiosisAPI client."""
-        self.testnet = testnet
         self.client = httpx.Client(
             base_url=self.base_url,
             timeout=timeout,
@@ -27,8 +26,8 @@ class SymbiosisClient:
 
     @property
     def base_url(self):
-        if self.testnet:
-            return "https://api.testnet.symbiosis.finance/crosschain/"
+        # if self.testnet:
+        #    return "https://api.testnet.symbiosis.finance/crosschain/"
         return "https://api.symbiosis.finance/crosschain/"
 
     def health_check(self, raise_exception: bool = False) -> bool:
