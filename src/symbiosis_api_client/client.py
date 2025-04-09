@@ -1,6 +1,7 @@
 import httpx
-
+from . import models as models
 import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +18,8 @@ class SymbiosisClient:
                 "Content-Type": "application/json",
             },
         )
-        self.chains: dict = {}
-        self.tokens: dict = {}
+        self.chains: list = []
+        self.tokens: list = []
 
     def close(self):
         """Close the HTTP client."""
@@ -44,24 +45,30 @@ class SymbiosisClient:
                 raise Exception("Symbiosis API is not healthy.")
             return False
 
-
-"""
-
-    def _load_chains(self):
-        with httpx.Client() as client:
-            response = client.get(self.base_url + "v1/chains")
+    def get_chains(self) -> list[models.ChainsResponseSchemaItem]:
+        response = self.client.get(self.base_url + "v1/chains")
         if not response.is_success:
             msg = f"Error fetching chains: {response.status_code}, {response.text}"
             logger.error(msg)
-            return {}
-        chains = response.json()
-        chains = {i["name"]: i["id"] for i in chains if i["name"] in needed_chain}
-        if not chains:
-            logger.error("No supported chains found.")
-            return {}
-        logger.info(f"Supported chains: {chains}")
+            return []
+        # convert to pydantic model of ChainsResponseSchema
+        chains = []
+        chains_list = response.json()
+        if not chains_list:
+            logger.error("Chains list is empty.")
+            return []
+        if not isinstance(chains_list, list):
+            logger.error("Chains list is not a list.")
+            return []
+        for chain in response.json():
+            chain_model = models.ChainsResponseSchemaItem(**chain)
+            chains.append(chain_model)
+        logger.info(f"Fetched {len(chains)} chains.")
+        self.chains = chains
         return chains
 
+
+"""
     def get_swap_limits(self) -> dict:
         # needed to verify minimum and maximum swap amounts
         endpoint = "/v1/swap-limits"
