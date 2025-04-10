@@ -488,7 +488,7 @@ class SwapResponseSchema(BaseModel):
 
 
 class SwapLimitsResponseSchemaItem(BaseModel):
-    chainId: float
+    chainId: int
     address: Address | str
     min: int
     max: int
@@ -499,7 +499,7 @@ class SwapLimitsResponseSchema(RootModel[List[SwapLimitsResponseSchemaItem]]):
 
 
 class SwapDurationsResponseSchemaItem(BaseModel):
-    toChainId: float
+    toChainId: int
     min: float
     max: float
 
@@ -690,7 +690,7 @@ class RevertResponseSchema(BaseModel):
 
 
 class ChainsResponseSchemaItem(BaseModel):
-    id: float
+    id: int
     name: str
     explorer: str
     icon: str
@@ -707,7 +707,7 @@ class Status(BaseModel):
 
 class Tx11(BaseModel):
     hash: str
-    chainId: float
+    chainId: int
     tokenAmount: TokenAmount
     time: str
     address: str
@@ -715,7 +715,7 @@ class Tx11(BaseModel):
 
 class TxIn(BaseModel):
     hash: str
-    chainId: float
+    chainId: int
     tokenAmount: TokenAmount
     time: str
     address: str
@@ -788,9 +788,9 @@ class BatchTxResponseSchema(RootModel[List[BatchTxResponseSchemaItem]]):
 
 
 class DirectRoutesResponseItem(BaseModel):
-    originChainId: float
+    originChainId: int
     originToken: str
-    destinationChainId: float
+    destinationChainId: int
     destinationToken: str
 
 
