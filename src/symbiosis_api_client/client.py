@@ -146,5 +146,17 @@ class SymbiosisClient:
         response.raise_for_status()
         return models.RevertResponseSchema.model_validate(response.json())
 
-    # TODO: Batch TX
+    def post_batch_tx(
+        self, payload: models.BatchTxRequestSchema
+    ) -> models.BatchTxResponseSchema:
+        """Returns the status of multiple cross-chain operations in a single request.
+
+        Works the same way as /v1/tx, but accepts an array of { chainId, transactionHash }
+        pairs to check the status of several operations at once.
+        """
+        payload_dump = payload.model_dump(exclude_none=True)
+        response = self.client.post("/v1/batch-tx", json=payload_dump)
+        response.raise_for_status()
+        return models.BatchTxResponseSchema.model_validate(response.json())
+
     # TODO: Zapping

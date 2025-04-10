@@ -780,7 +780,7 @@ class BatchTxResponseSchemaItem(BaseModel):
     status: Status
     tx: Tx13
     txIn: TxIn1
-    transitTokenSent: TransitTokenSent
+    transitTokenSent: TransitTokenSent | None
 
 
 class BatchTxResponseSchema(RootModel[List[BatchTxResponseSchemaItem]]):
