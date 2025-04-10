@@ -1,16 +1,24 @@
 import logging
 
 import httpx
+from ratelimit import limits, sleep_and_retry
 
-# from . import models as models
 from . import models as models
 
 logger = logging.getLogger(__name__)
 
 
 class SymbiosisClient:
+
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(SymbiosisClient, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self, timeout: float = 10.0) -> None:
-        """Initialize the SymbiosisAPI client."""
+        """Initialize the SymbiosisAPI client, singleton + rate limiting."""
         self.client = httpx.Client(
             base_url=self.base_url,
             timeout=timeout,
@@ -30,6 +38,8 @@ class SymbiosisClient:
         #    return "https://api.testnet.symbiosis.finance/crosschain/"
         return "https://api.symbiosis.finance/crosschain/"
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def health_check(self, raise_exception: bool = False) -> bool:
         # use self.client to check the health of the API
         response = self.client.get(self.base_url + "health-check")
@@ -45,42 +55,56 @@ class SymbiosisClient:
                 response.raise_for_status()
             return False
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def get_chains(self) -> models.ChainsResponseSchema:
         """Returns the chains available for swapping."""
         response = self.client.get(self.base_url + "v1/chains")
         response.raise_for_status()
         return models.ChainsResponseSchema.model_validate(response.json())
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def get_tokens(self) -> models.TokensResponseSchema:
         """Returns the tokens available for swapping."""
         response = self.client.get(self.base_url + "v1/tokens")
         response.raise_for_status()
         return models.TokensResponseSchema.model_validate(response.json())
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def get_direct_routes(self) -> models.DirectRoutesResponse:
         """Returns the direct routes for all tokens."""
         response = self.client.get(self.base_url + "v1/direct-routes")
         response.raise_for_status()
         return models.DirectRoutesResponse.model_validate(response.json())
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def get_fees(self) -> models.FeesResponseSchema:
         """Returns the current fees for all tokens."""
         response = self.client.get(self.base_url + "v1/fees")
         response.raise_for_status()
         return models.FeesResponseSchema.model_validate(response.json())
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def get_swap_limits(self) -> models.SwapLimitsResponseSchema:
         """Returns the swap limits for all tokens."""
         response = self.client.get(self.base_url + "v1/swap-limits")
         response.raise_for_status()
         return models.SwapLimitsResponseSchema.model_validate(response.json())
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def get_swap_durations(self) -> models.SwapDurationsResponseSchema:
         """Returns the swap limits for all tokens."""
         response = self.client.get(self.base_url + "v1/swap-durations")
         response.raise_for_status()
         return models.SwapDurationsResponseSchema.model_validate(response.json())
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def get_stucked(
         self, payload: models.StuckedRequestSchema
     ) -> models.StuckedResponseSchema:
@@ -89,6 +113,8 @@ class SymbiosisClient:
         response.raise_for_status()
         return models.StuckedResponseSchema.model_validate(response.json())
 
+    @sleep_and_retry
+    @limits(calls=1, period=1)
     def get_transaction(self, payload: models.Tx12) -> models.TxResponseSchema:
         """Returns the operation by its transaction hash."""
         response = self.client.get(

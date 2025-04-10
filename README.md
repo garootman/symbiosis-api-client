@@ -1,15 +1,12 @@
 # symbiosis-client-py
 
-> [!IMPORTANT]
-> WORK IN PROGRESS, DO NOT USE!
-
 Python client for [Symbiosis Finance](https://symbiosis.finance/) REST API
 
 ## ToDo Plan:
 
 - [ ] Main functionality
 - [ ] Test Stuck transactions functionality
-- [ ] Throttling + Singleton
+- [X] Throttling + Singleton
 - [ ] Acync support
 - [ ] Enums
 - [ ] Exception Codes

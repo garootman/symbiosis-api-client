@@ -22,7 +22,12 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["httpx>=0.28.1", "pydantic>=2.10.6", "sphinx>=7.1.2"]
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.10.6",
+    "ratelimit>=2.2.1",
+    "sphinx>=7.1.2",
+]
 
 [project.urls]
 Documentation = "https://symbiosis-api-client.readthedocs.io/en/latest/"
