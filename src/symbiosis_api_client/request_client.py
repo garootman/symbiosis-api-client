@@ -11,7 +11,13 @@ logger = logging.getLogger("HttpxRequestClient")
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
-API_BASE_URL = "https://api.symbiosis.finance/crosschain/"
+API_BASE_URL = "https://api.symbiosis.finance/"
+
+
+# TODO:
+# /calculations/v1/swap/discount/tiers'
+# /calculations/v1/swap/discount/chains'
+# https://api.symbiosis.finance/calculations/v1/token/price
 
 
 class HttpxRequestClient:
@@ -53,7 +59,7 @@ class HttpxRequestClient:
 
     def health_check(self, raise_exception: bool = False) -> bool:
         # use self.client to check the health of the API
-        response = self.client.get("/health-check")
+        response = self.client.get("/crosschain/health-check")
         if response.is_success:
             logger.info("Symbiosis API is healthy.")
             return True
@@ -68,38 +74,38 @@ class HttpxRequestClient:
 
     def get_chains(self) -> models.ChainsResponseSchema:
         """Returns the chains available for swapping."""
-        response = self.client.get("/v1/chains")
+        response = self.client.get("/crosschain/v1/chains")
         response.raise_for_status()
         return models.ChainsResponseSchema.model_validate(response.json())
 
     def get_tokens(self) -> models.TokensResponseSchema:
         """Returns the tokens available for swapping."""
-        response = self.client.get("/v1/tokens")
+        response = self.client.get("/crosschain/v1/tokens")
         response.raise_for_status()
         return models.TokensResponseSchema.model_validate(response.json())
 
     def get_direct_routes(self) -> models.DirectRoutesResponse:
         """Returns the direct routes for all tokens."""
-        response = self.client.get("/v1/direct-routes")
+        response = self.client.get("/crosschain/v1/direct-routes")
         response.raise_for_status()
         return models.DirectRoutesResponse.model_validate(response.json())
 
     def get_fees(self) -> models.FeesResponseSchema:
         """Returns the current fees for all tokens."""
-        response = self.client.get("/v1/fees")
+        response = self.client.get("/crosschain/v1/fees")
         response.raise_for_status()
         return models.FeesResponseSchema.model_validate(response.json())
 
     def get_swap_limits(self) -> models.SwapLimitsResponseSchema:
         """Returns the minimum and maximum allowed swap amounts for supported blockchain networks."""
-        response = self.client.get("/v1/swap-limits")
+        response = self.client.get("/crosschain/v1/swap-limits")
         response.raise_for_status()
         return models.SwapLimitsResponseSchema.model_validate(response.json())
 
     def get_swap_durations(self) -> models.SwapDurationsResponseSchema:
         """Returns estimated cross-chain swap execution times for supported blockchain networks.
         The duration is measured in seconds and is based on historical data."""
-        response = self.client.get("/v1/swap-durations")
+        response = self.client.get("/crosschain/v1/swap-durations")
         response.raise_for_status()
         return models.SwapDurationsResponseSchema.model_validate(response.json())
 
@@ -107,14 +113,14 @@ class HttpxRequestClient:
         self, payload: models.StuckedRequestSchema
     ) -> models.StuckedResponseSchema:
         """Returns a list of stuck cross-chain operations associated with the specified address."""
-        response = self.client.get(f"/v1/stucked/{payload.address}")
+        response = self.client.get(f"/crosschain/v1/stucked/{payload.address}")
         response.raise_for_status()
         return models.StuckedResponseSchema.model_validate(response.json())
 
     def get_transaction(self, payload: models.Tx12) -> models.TxResponseSchema:
         """Returns the operation by its transaction hash."""
         response = self.client.get(
-            f"/v1/tx/{payload.chainId}/{payload.transactionHash}"
+            f"/crosschain/v1/tx/{payload.chainId}/{payload.transactionHash}"
         )
         response.raise_for_status()
         return models.TxResponseSchema.model_validate(response.json())
@@ -130,7 +136,7 @@ class HttpxRequestClient:
         """
 
         payload_dump = payload.model_dump(exclude_none=True)
-        response = self.client.post("/v1/swap", json=payload_dump)
+        response = self.client.post("/crosschain/v1/swap", json=payload_dump)
         response.raise_for_status()
         return models.SwapResponseSchema.model_validate(response.json())
 
@@ -146,7 +152,7 @@ class HttpxRequestClient:
         :return: The response from the Symbiosis Finance API.
         """
         payload_dump = payload.model_dump(exclude_none=True)
-        response = self.client.post("/v1/revert", json=payload_dump)
+        response = self.client.post("/crosschain/v1/revert", json=payload_dump)
         response.raise_for_status()
         return models.RevertResponseSchema.model_validate(response.json())
 
@@ -159,7 +165,7 @@ class HttpxRequestClient:
         pairs to check the status of several operations at once.
         """
         payload_dump = payload.model_dump(exclude_none=True)
-        response = self.client.post("/v1/batch-tx", json=payload_dump)
+        response = self.client.post("/crosschain/v1/batch-tx", json=payload_dump)
         response.raise_for_status()
         return models.BatchTxResponseSchema.model_validate(response.json())
 
@@ -177,6 +183,8 @@ class HttpxRequestClient:
         """
 
         payload_dump = payload.model_dump(exclude_none=True)
-        response = self.client.post("/v1/zapping/exact_in", json=payload_dump)
+        response = self.client.post(
+            "/crosschain/v1/zapping/exact_in", json=payload_dump
+        )
         response.raise_for_status()
         return models.ZappingExactInResponseSchema.model_validate(response.json())
