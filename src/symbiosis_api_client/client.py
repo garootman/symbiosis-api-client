@@ -159,4 +159,20 @@ class SymbiosisClient:
         response.raise_for_status()
         return models.BatchTxResponseSchema.model_validate(response.json())
 
-    # TODO: Zapping
+    def post_zapping(
+        self, payload: models.ZappingExactInRequestSchema
+    ) -> models.ZappingExactInResponseSchema:
+        """Returns calldata to execute a cross-chain zap operation.
+
+        A cross-chain zap combines a cross-chain swap from the source token to
+        the destination token with a subsequent deposit of the destination token
+        into a liquidity pool managed by Symbiosis or a third-party DeFi protocol.
+
+        :param payload: The payload containing the zap details.
+        :return: The response from the Symbiosis Finance API.
+        """
+
+        payload_dump = payload.model_dump(exclude_none=True)
+        response = self.client.post("/v1/zapping/exact_in", json=payload_dump)
+        response.raise_for_status()
+        return models.ZappingExactInResponseSchema.model_validate(response.json())
