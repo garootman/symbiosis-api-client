@@ -171,7 +171,7 @@ class SymbiosisApiClient:
                 return item
         return None
 
-    def _get_token_usd_price(self, token, *args, **kwargs):
+    def _get_token_usd_price(self, token: str) -> float | None:
         """Get the USD price of a token."""
         raise NotImplementedError
 

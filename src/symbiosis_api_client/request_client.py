@@ -137,7 +137,10 @@ class HttpxRequestClient:
     def get_calc_token_price(
         self, payload: models.TokenPriceRequestSchema
     ) -> models.TokenPriceResponseSchema:
-        """Returns the price of the token in USD."""
+        """Returns the price of the token in USD.
+
+        To get chain's carrier token price, leave address empty.
+        """
         payload_dump = payload.model_dump(exclude_none=True)
         response = self.client.post("/calculations/v1/token/price", json=payload_dump)
         response.raise_for_status()
