@@ -7,7 +7,9 @@ import httpx
 from . import models as models
 from .limiter import SyncRateLimitedTransport
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("HttpxRequestClient")
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 API_BASE_URL = "https://api.symbiosis.finance/crosschain/"
 
@@ -23,11 +25,13 @@ class HttpxRequestClient:
 
     def __init__(
         self,
-        base_url: str = API_BASE_URL,
+        base_url: str | None = None,
         httpx_client: Optional[httpx.Client] = None,
         timeout: float = 10.0,
     ) -> None:
         """Initialize the SymbiosisAPI client, singleton + rate limiting."""
+        if base_url is None:
+            base_url = API_BASE_URL
 
         if not httpx_client:
             transport = SyncRateLimitedTransport.create(
@@ -88,13 +92,14 @@ class HttpxRequestClient:
         return models.FeesResponseSchema.model_validate(response.json())
 
     def get_swap_limits(self) -> models.SwapLimitsResponseSchema:
-        """Returns the swap limits for all tokens."""
+        """Returns the minimum and maximum allowed swap amounts for supported blockchain networks."""
         response = self.client.get("/v1/swap-limits")
         response.raise_for_status()
         return models.SwapLimitsResponseSchema.model_validate(response.json())
 
     def get_swap_durations(self) -> models.SwapDurationsResponseSchema:
-        """Returns the swap limits for all tokens."""
+        """Returns estimated cross-chain swap execution times for supported blockchain networks.
+        The duration is measured in seconds and is based on historical data."""
         response = self.client.get("/v1/swap-durations")
         response.raise_for_status()
         return models.SwapDurationsResponseSchema.model_validate(response.json())
