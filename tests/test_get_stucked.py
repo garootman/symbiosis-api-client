@@ -1,11 +1,11 @@
 import pytest
 
-from symbiosis_api_client import SymbiosisClient, models
+from symbiosis_api_client import HttpxClient, models
 
 
 @pytest.fixture
 def client():
-    clnt = SymbiosisClient()
+    clnt = HttpxClient()
     assert clnt.health_check() is True
     yield clnt
     clnt.close()

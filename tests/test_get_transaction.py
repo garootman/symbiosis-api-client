@@ -2,12 +2,12 @@ import pytest
 
 # from dotenv import load_dotenv
 # load_dotenv()
-from symbiosis_api_client import SymbiosisClient, models
+from symbiosis_api_client import HttpxClient, models
 
 
 @pytest.fixture
 def client():
-    clnt = SymbiosisClient()
+    clnt = HttpxClient()
     yield clnt
     clnt.close()
 
