@@ -2,12 +2,12 @@ import time
 
 import pytest
 
-from symbiosis_api_client import HttpxClient, models
+from symbiosis_api_client import HttpxRequestClient, models
 
 
 @pytest.fixture
 def client():
-    clnt = HttpxClient()
+    clnt = HttpxRequestClient()
     assert clnt.health_check() is True
     yield clnt
     clnt.close()
