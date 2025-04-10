@@ -13,9 +13,21 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 
 API_BASE_URL = "https://api.symbiosis.finance/"
 
-
-# TODO:
-# https://api.symbiosis.finance/calculations/v1/token/price
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0",
+    "Accept": "*/*",
+    "Accept-Language": "en,en-US;q=0.7,en-CA;q=0.3",
+    "Content-Type": "application/json",
+    "Origin": "https://app.symbiosis.finance",
+    "DNT": "1",
+    "Connection": "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-site",
+    "Sec-GPC": "1",
+    "Pragma": "no-cache",
+    "Cache-Control": "no-cache",
+}
 
 
 class HttpxRequestClient:
@@ -41,13 +53,10 @@ class HttpxRequestClient:
                 rate=1, period=timedelta(seconds=1)
             )
             httpx_client = httpx.Client(
+                headers=HEADERS,
                 base_url=base_url,
                 transport=transport,
                 timeout=10.0,
-                headers={
-                    "accept": "application/json",
-                    "Content-Type": "application/json",
-                },
             )
         self.client = httpx_client
 
@@ -124,6 +133,15 @@ class HttpxRequestClient:
         response = self.client.get("/calculations/v1/swap/discount/chains")
         response.raise_for_status()
         return models.SwapChainsResponseSchema.model_validate(response.json())
+
+    def get_calc_token_price(
+        self, payload: models.TokenPriceRequestSchema
+    ) -> models.TokenPriceResponseSchema:
+        """Returns the price of the token in USD."""
+        payload_dump = payload.model_dump(exclude_none=True)
+        response = self.client.post("/calculations/v1/token/price", json=payload_dump)
+        response.raise_for_status()
+        return models.TokenPriceResponseSchema.model_validate(response.json())
 
     def get_stucked(
         self, payload: models.StuckedRequestSchema

@@ -171,6 +171,10 @@ class SymbiosisApiClient:
                 return item
         return None
 
+    def _get_token_usd_price(self, token, *args, **kwargs):
+        """Get the USD price of a token."""
+        raise NotImplementedError
+
     def new_swap(
         self,
         from_chain: str,

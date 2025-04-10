@@ -849,3 +849,22 @@ class SwapDiscountTiersResponseSchema(
 
 class SwapChainsResponseSchema(RootModel[List[int]]):
     pass
+
+
+class TokenPriceRequestSchemaItem(BaseModel):
+    address: str
+    chain_id: int
+
+
+class TokenPriceRequestSchema(RootModel[List[TokenPriceRequestSchemaItem]]):
+    pass
+
+
+class TokenPriceResponseSchemaItem(BaseModel):
+    address: str
+    chain_id: int
+    price: float | None = None
+
+
+class TokenPriceResponseSchema(RootModel[List[TokenPriceResponseSchemaItem]]):
+    pass
