@@ -109,7 +109,9 @@ class SymbiosisClient:
 
     def get_transaction(self, payload: models.Tx12) -> models.TxResponseSchema:
         """Returns the operation by its transaction hash."""
-        response = self.client.get("/v1/tx/{payload.chainId}/{payload.transactionHash}")
+        response = self.client.get(
+            f"/v1/tx/{payload.chainId}/{payload.transactionHash}"
+        )
         response.raise_for_status()
         return models.TxResponseSchema.model_validate(response.json())
 
@@ -128,6 +130,21 @@ class SymbiosisClient:
         response.raise_for_status()
         return models.SwapResponseSchema.model_validate(response.json())
 
-    # TODO: Revert
+    def post_revert(
+        self, payload: models.RevertRequestSchema
+    ) -> models.RevertResponseSchema:
+        """Returns calldata required to revert a stuck cross-chain operation.
+
+        Data includes: swapping, bridging, zapping, interchain communicating.
+        If a cross-operation gets stuck, Symbiosis automatically reverts such swaps.
+
+        :param payload: The payload containing the revert details.
+        :return: The response from the Symbiosis Finance API.
+        """
+        payload_dump = payload.model_dump(exclude_none=True)
+        response = self.client.post("/v1/revert", json=payload_dump)
+        response.raise_for_status()
+        return models.RevertResponseSchema.model_validate(response.json())
+
     # TODO: Batch TX
     # TODO: Zapping
