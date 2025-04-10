@@ -63,6 +63,15 @@ def test_client_get_limits(client):
     assert all(isinstance(c, models.SwapLimitsResponseSchemaItem) for c in limits.root)
 
 
+def test_client_get_durations(client):
+    limits = client.get_swap_durations()
+    assert isinstance(limits, models.SwapDurationsResponseSchema)
+    assert len(limits.root) > 30
+    assert all(
+        isinstance(c, models.SwapDurationsResponseSchemaItem) for c in limits.root
+    )
+
+
 def test_get_stucked(client, stuck_address):
     struck = client.get_stucked(stuck_address)
     assert isinstance(struck, models.StuckedResponseSchema)

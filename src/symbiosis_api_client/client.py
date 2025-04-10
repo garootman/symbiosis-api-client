@@ -83,6 +83,12 @@ class SymbiosisClient:
         response.raise_for_status()
         return models.SwapLimitsResponseSchema.model_validate(response.json())
 
+    def get_swap_durations(self) -> models.SwapDurationsResponseSchema:
+        """Returns the swap limits for all tokens."""
+        response = self.client.get(self.base_url + "/v1/swap-durations")
+        response.raise_for_status()
+        return models.SwapDurationsResponseSchema.model_validate(response.json())
+
     def get_stucked(
         self, payload: models.StuckedRequestSchema
     ) -> models.StuckedResponseSchema:
