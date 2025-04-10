@@ -37,6 +37,11 @@ class SymbiosisApiClient:
             self._chains = self._load_chains()
         return self._chains
 
+    @property
+    def chain_names(self) -> list[str]:
+        """Return a list of chain names."""
+        return [chain.name for chain in self.chains]
+
     def _load_chains(self) -> list[models.ChainsResponseSchemaItem]:
         response = self._hrc.get_chains()
         self._chains = response.root
@@ -100,3 +105,44 @@ class SymbiosisApiClient:
     def close(self) -> None:
         """Close the HTTP client."""
         self._hrc.close()
+
+    def _lookup_chain(
+        self, chain_name: str | None = None, chain_id: int | None = None
+    ) -> models.ChainsResponseSchemaItem | None:
+        if chain_name is None and chain_id is None:
+            raise ValueError("Either chain_name or chain_id must be provided.")
+        if chain_name is not None and chain_id is not None:
+            raise ValueError("Only one of chain_name or chain_id must be provided.")
+        if chain_name is not None:
+            for item in self.chains:
+                if item.name == chain_name:
+                    return item
+        if chain_id is not None:
+            for item in self.chains:
+                if item.id == chain_id:
+                    return item
+        return None
+
+    def _lookup_token(
+        self, symbol: str, chainId: int
+    ) -> models.TokensResponseSchemaItem | None:
+        chain = self._lookup_chain(chain_id=chainId)
+        if chain is None:
+            return None
+        for item in self.tokens:
+            if item.symbol == symbol and item.chainId == chain.id:
+                return item
+        return None
+
+    def new_swap(
+        self,
+        from_chain: str,
+        to_chain: str,
+        from_token: str,
+        to_token: str,
+        amount: float,
+        recipient: str,
+    ):
+        """Create a new swap."""
+
+    pass
