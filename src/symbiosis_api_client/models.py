@@ -5,10 +5,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-
-# Address = constr(
-#    pattern=r"(^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$)|(^(0x[a-fA-F0-9]{40})$)"
-# )
+from enum import Enum
 from typing import Annotated, Any, List, NewType, Optional, Union
 
 from pydantic import (
@@ -16,6 +13,7 @@ from pydantic import (
     Field,
     RootModel,
     StringConstraints,
+    field_serializer,
     field_validator,
 )
 
@@ -76,6 +74,11 @@ class FeesResponseItem(BaseModel):
             raise ValueError(f"Value {v} is not a number")
         return int(num)
 
+    @field_serializer("value")
+    @classmethod
+    def serialize_value(cls, v):
+        return str(v)
+
 
 class FeesResponseSchema(BaseModel):
     fees: list[FeesResponseItem]
@@ -112,6 +115,11 @@ class TokenAmountSchema(BaseModel):
             raise ValueError(f"Value {v} is not a number")
         return int(num)
 
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
+
 
 class Token(BaseModel):
     address: Any
@@ -144,6 +152,11 @@ class Value(BaseModel):
             raise ValueError(f"Value {v} is not a number")
         return int(num)
 
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
+
 
 class Save(BaseModel):
     address: Any
@@ -161,6 +174,11 @@ class Save(BaseModel):
         if num is None:
             raise ValueError(f"Value {v} is not a number")
         return int(num)
+
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
 
 
 class FeeItemSchema(BaseModel):
@@ -187,6 +205,11 @@ class TokenAmountIn(BaseModel):
             raise ValueError(f"Value {v} is not a number")
         return int(num)
 
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
+
 
 class TokenOut(BaseModel):
     address: Any
@@ -208,6 +231,11 @@ class RevertableAddress(BaseModel):
     address: Address
 
 
+class SelectMode(str, Enum):
+    BEST_RETURN = "best_return"
+    FASTEST = "fastest"
+
+
 class SwapRequestSchema(BaseModel):
     tokenAmountIn: TokenAmountIn
     tokenOut: TokenOut
@@ -216,9 +244,14 @@ class SwapRequestSchema(BaseModel):
     slippage: int
     middlewareCall: Optional[MiddlewareCall] = None
     revertableAddresses: Optional[List[RevertableAddress]] = None
-    selectMode: Optional[str] = None
+    selectMode: Optional[SelectMode] = None
     partnerAddress: Optional[str] = None
     refundAddress: Optional[Address] = None
+
+    model_config = {
+        "populate_by_name": True,
+        "serialize_by_alias": True,
+    }
 
 
 class EvmTxSchema(BaseModel):
@@ -236,6 +269,11 @@ class TronTxSchema(BaseModel):
     value: Optional[str] = None
     feeLimit: int
     functionSelector: Optional[str] = None
+
+    model_config = {
+        "populate_by_name": True,
+        "serialize_by_alias": True,
+    }
 
 
 class Message(BaseModel):
@@ -274,6 +312,11 @@ class Tx1(BaseModel):
     feeLimit: int
     functionSelector: Optional[str] = None
 
+    model_config = {
+        "populate_by_name": True,
+        "serialize_by_alias": True,
+    }
+
 
 class Tx2(BaseModel):
     validUntil: int
@@ -305,6 +348,11 @@ class Fee(BaseModel):
         if num is None:
             raise ValueError(f"Value {v} is not a number")
         return int(num)
+
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
 
 
 class Fee1(BaseModel):
@@ -345,6 +393,11 @@ class TokenAmountOut(BaseModel):
             raise ValueError(f"Value {v} is not a number")
         return int(num)
 
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
+
 
 class TokenAmountOutMin(BaseModel):
     address: Any
@@ -362,6 +415,11 @@ class TokenAmountOutMin(BaseModel):
         if num is None:
             raise ValueError(f"Value {v} is not a number")
         return int(num)
+
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
 
 
 class AmountInUsd(BaseModel):
@@ -381,6 +439,11 @@ class AmountInUsd(BaseModel):
             raise ValueError(f"Value {v} is not a number")
         return int(num)
 
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
+
 
 class Reward(BaseModel):
     address: Any
@@ -398,6 +461,11 @@ class Reward(BaseModel):
         if num is None:
             raise ValueError(f"Value {v} is not a number")
         return int(num)
+
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
 
 
 class SwapResponseSchema(BaseModel):
@@ -446,6 +514,11 @@ class ZappingExactInRequestSchema(BaseModel):
     from_: Address = Field(..., alias="from")
     slippage: int
 
+    model_config = {
+        "populate_by_name": True,
+        "serialize_by_alias": True,
+    }
+
 
 class Tx5(BaseModel):
     chainId: int
@@ -462,6 +535,11 @@ class Tx6(BaseModel):
     value: Optional[str] = None
     feeLimit: int
     functionSelector: Optional[str] = None
+
+    model_config = {
+        "populate_by_name": True,
+        "serialize_by_alias": True,
+    }
 
 
 class Tx7(BaseModel):
@@ -494,6 +572,11 @@ class Fee2(BaseModel):
         if num is None:
             raise ValueError(f"Value {v} is not a number")
         return int(num)
+
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
 
 
 class Fee3(BaseModel):
@@ -548,6 +631,11 @@ class TokenAmount(BaseModel):
             raise ValueError(f"Value {v} is not a number")
         return int(num)
 
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
+
 
 class StuckedResponseSchemaItem(BaseModel):
     hash: str
@@ -588,6 +676,11 @@ class Fee4(BaseModel):
         if num is None:
             raise ValueError(f"Value {v} is not a number")
         return int(num)
+
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
 
 
 class RevertResponseSchema(BaseModel):
@@ -644,6 +737,11 @@ class TransitTokenSent(BaseModel):
         if num is None:
             raise ValueError(f"Value {v} is not a number")
         return int(num)
+
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
 
 
 class TxResponseSchema(BaseModel):

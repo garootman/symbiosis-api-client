@@ -45,14 +45,6 @@ class SymbiosisClient:
                 response.raise_for_status()
             return False
 
-    def __get_raise_validate(
-        self, url: str, model: models.BaseModel
-    ) -> models.BaseModel:
-        """Generic method to get data from the API and validate it against a model."""
-        response = self.client.get(url)
-        response.raise_for_status()
-        return model.model_validate(response.json())
-
     def get_chains(self) -> models.ChainsResponseSchema:
         """Returns the chains available for swapping."""
         response = self.client.get(self.base_url + "v1/chains")
@@ -65,27 +57,27 @@ class SymbiosisClient:
         response.raise_for_status()
         return models.TokensResponseSchema.model_validate(response.json())
 
-    def get_direct_routes(self) -> list[models.DirectRoutesResponseItem]:
+    def get_direct_routes(self) -> models.DirectRoutesResponse:
         """Returns the direct routes for all tokens."""
-        response = self.client.get(self.base_url + "/v1/direct-routes")
+        response = self.client.get(self.base_url + "v1/direct-routes")
         response.raise_for_status()
         return models.DirectRoutesResponse.model_validate(response.json())
 
     def get_fees(self) -> models.FeesResponseSchema:
         """Returns the current fees for all tokens."""
-        response = self.client.get(self.base_url + "/v1/fees")
+        response = self.client.get(self.base_url + "v1/fees")
         response.raise_for_status()
         return models.FeesResponseSchema.model_validate(response.json())
 
     def get_swap_limits(self) -> models.SwapLimitsResponseSchema:
         """Returns the swap limits for all tokens."""
-        response = self.client.get(self.base_url + "/v1/swap-limits")
+        response = self.client.get(self.base_url + "v1/swap-limits")
         response.raise_for_status()
         return models.SwapLimitsResponseSchema.model_validate(response.json())
 
     def get_swap_durations(self) -> models.SwapDurationsResponseSchema:
         """Returns the swap limits for all tokens."""
-        response = self.client.get(self.base_url + "/v1/swap-durations")
+        response = self.client.get(self.base_url + "v1/swap-durations")
         response.raise_for_status()
         return models.SwapDurationsResponseSchema.model_validate(response.json())
 
@@ -93,71 +85,33 @@ class SymbiosisClient:
         self, payload: models.StuckedRequestSchema
     ) -> models.StuckedResponseSchema:
         """Returns a list of stuck cross-chain operations associated with the specified address."""
-        response = self.client.get(self.base_url + f"/v1/stucked/{payload.address}")
+        response = self.client.get(self.base_url + f"v1/stucked/{payload.address}")
         response.raise_for_status()
         return models.StuckedResponseSchema.model_validate(response.json())
 
     def get_transaction(self, payload: models.Tx12) -> models.TxResponseSchema:
         """Returns the operation by its transaction hash."""
         response = self.client.get(
-            self.base_url + f"/v1/tx/{payload.chainId}/{payload.transactionHash}"
+            self.base_url + f"v1/tx/{payload.chainId}/{payload.transactionHash}"
         )
         response.raise_for_status()
         return models.TxResponseSchema.model_validate(response.json())
 
-
-"""
-
-
-    def __swap_tokens(
+    def post_swap(
         self,
-        from_chain_id,
-        to_chain_id,
-        from_token_address,
-        to_token_address,
-        amount,
-        from_address,
-        to_address,
-    ):
+        payload: models.SwapRequestSchema,
+    ) -> models.SwapResponseSchema:
+        """Performs a cross-chain swap using the Symbiosis Finance API.
 
-        Perform a cross-chain token swap using the Symbiosis Finance API.
-
-        A General Workflow for Performing a Swap Using the Symbiosis API:
-            Call /v1/chains to get a list of available blockchain networks.
-            Call /v1/swap-limits to verify swap limits (the minimum and maximum allowed swap amounts).
-            Call /v1/swap to get the calldata (payload) needed to execute the swap through Symbiosis protocol.
-            If the source token is not a native gas token (e.g., ERC-20 tokens on EVM chains), approve the smart contract to spend the user's tokens.
-            Sign the calldata obtained in Step 3 using the wallet. Submit the transaction to the source blockchain.
-            Since network conditions constantly change, calldata must be regenerated periodically (e.g., every 30 seconds) to ensure it remains valid before execution.
-            Call /v1/tx/{chainID}/{txHash} to monitor the progress of the swap. This endpoint provides real-time status updates for cross-chain operations
-
-        :param api_url: The base URL of the Symbiosis Finance API.
-        :param from_chain_id: The chain ID of the source blockchain.
-        :param to_chain_id: The chain ID of the destination blockchain.
-        :param from_token_address: The token address on the source blockchain.
-        :param to_token_address: The token address on the destination blockchain.
-        :param amount: The amount of tokens to swap.
-        :param from_address: The wallet address initiating the swap.
-        :param to_address: The wallet address receiving the swapped tokens.
-
+        :param payload: The payload containing the swap details.
         :return: The response from the Symbiosis Finance API.
-        endpoint = "/v1/swap"
-        url = self.base_url + endpoint
-        payload = {
-            "fromChainId": from_chain_id,
-            "toChainId": to_chain_id,
-            "fromTokenAddress": from_token_address,
-            "toTokenAddress": to_token_address,
-            "amount": amount,
-            "from": from_address,
-            "to": to_address,
-        }
+        """
 
-        try:
-            with httpx.Client() as client:
-                response = client.post(url, json=payload)
-            response.raise_for_status()
-            return response.json()
-        except httpx.RequestError as e:
-            return {"error": str(e)}
-"""
+        payload_dump = payload.model_dump(exclude_none=True)
+        response = self.client.post(self.base_url + "v1/swap", json=payload_dump)
+        response.raise_for_status()
+        return models.SwapResponseSchema.model_validate(response.json())
+
+    # TODO: Revert
+    # TODO: Batch TX
+    # TODO: Zapping
