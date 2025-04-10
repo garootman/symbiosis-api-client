@@ -15,8 +15,6 @@ API_BASE_URL = "https://api.symbiosis.finance/"
 
 
 # TODO:
-# /calculations/v1/swap/discount/tiers'
-# /calculations/v1/swap/discount/chains'
 # https://api.symbiosis.finance/calculations/v1/token/price
 
 
@@ -120,6 +118,12 @@ class HttpxRequestClient:
         response = self.client.get("/calculations/v1/swap/discount/tiers")
         response.raise_for_status()
         return models.SwapDiscountTiersResponseSchema.model_validate(response.json())
+
+    def get_swap_chains(self):
+        """Returns the swap chains for supported blockchain networks."""
+        response = self.client.get("/calculations/v1/swap/discount/chains")
+        response.raise_for_status()
+        return models.SwapChainsResponseSchema.model_validate(response.json())
 
     def get_stucked(
         self, payload: models.StuckedRequestSchema

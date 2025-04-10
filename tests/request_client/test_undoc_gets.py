@@ -21,3 +21,9 @@ def test_get_swap_tiers(client):
     swap_tiers = client.get_swap_tiers()
     assert isinstance(swap_tiers, models.SwapDiscountTiersResponseSchema)
     assert len(swap_tiers.root) > 0
+
+
+def test_get_swap_chains(client):
+    chains = client.get_swap_chains()
+    assert isinstance(chains, models.SwapChainsResponseSchema)
+    assert len(chains.root) > 0

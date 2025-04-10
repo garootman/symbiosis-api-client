@@ -32,6 +32,19 @@ class SymbiosisApiClient:
         self._swap_durations: list[models.SwapDurationsResponseSchemaItem] = []
         self._swap_configs: list[models.SwapConfigsResponseItem] = []
         self._swap_tiers: list[models.SwapDiscountTiersResponseSchemaItem] = []
+        self._swap_chains: list[int] = []
+
+    @property
+    def swap_chains(self) -> list[int]:
+        """Return a list of chain IDs."""
+        if not self._swap_chains:
+            self._swap_chains = self._load_swap_chains()
+        return self._swap_chains
+
+    def _load_swap_chains(self) -> list[int]:
+        response = self._hrc.get_swap_chains()
+        self._swap_chains = response.root
+        return self._swap_chains
 
     @property
     def swap_tiers(self) -> list[models.SwapDiscountTiersResponseSchemaItem]:

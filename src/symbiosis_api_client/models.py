@@ -845,3 +845,7 @@ class SwapDiscountTiersResponseSchema(
     RootModel[List[SwapDiscountTiersResponseSchemaItem]]
 ):
     pass
+
+
+class SwapChainsResponseSchema(RootModel[List[int]]):
+    pass

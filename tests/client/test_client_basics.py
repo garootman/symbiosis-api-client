@@ -106,3 +106,13 @@ def test_load_swap_tiers(client):
     )
     assert client._swap_tiers == swap_tiers
     assert client.swap_tiers == swap_tiers
+
+
+def test_load_swap_chains(client):
+    assert client._swap_chains == []
+    swap_chains = client._load_swap_chains()
+    assert len(swap_chains) > 5
+    assert isinstance(swap_chains, list)
+    assert all(isinstance(chain, int) for chain in client._swap_chains)
+    assert client._swap_chains == swap_chains
+    assert client.swap_chains == swap_chains
