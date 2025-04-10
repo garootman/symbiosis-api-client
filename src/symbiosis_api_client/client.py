@@ -25,43 +25,79 @@ class SymbiosisApiClient:
             timeout=timeout,
         )
         self._hrc.health_check(raise_exception=True)
-        self.chains: list[models.ChainsResponseSchemaItem] = []
-        self.tokens: list[models.TokensResponseSchemaItem] = []
-        self.direct_routes: list[models.DirectRoutesResponseItem] = []
-        self.fees: list[models.FeesResponseItem] = []
-        self.swap_limits: list[models.SwapLimitsResponseSchemaItem] = []
-        self.swap_durations: list[models.SwapDurationsResponseSchemaItem] = []
 
-    def laod_chains(self) -> list[models.ChainsResponseSchemaItem]:
+        self._chains: list[models.ChainsResponseSchemaItem] = []
+        self._tokens: list[models.TokensResponseSchemaItem] = []
+        self._routes: list[models.DirectRoutesResponseItem] = []
+        self._fees: list[models.FeesResponseItem] = []
+        self._swap_limits: list[models.SwapLimitsResponseSchemaItem] = []
+        self._swap_durations: list[models.SwapDurationsResponseSchemaItem] = []
+
+    @property
+    def chains(self) -> list[models.ChainsResponseSchemaItem]:
+        if not self._chains:
+            self._chains = self._load_chains()
+        return self._chains
+
+    def _load_chains(self) -> list[models.ChainsResponseSchemaItem]:
         response = self._hrc.get_chains()
-        self.chains = response.root
-        return self.chains
+        self._chains = response.root
+        return self._chains
 
-    def laod_tokens(self) -> list[models.TokensResponseSchemaItem]:
+    @property
+    def tokens(self) -> list[models.TokensResponseSchemaItem]:
+        if not self._tokens:
+            self._tokens = self._load_tokens()
+        return self._tokens
+
+    def _load_tokens(self) -> list[models.TokensResponseSchemaItem]:
         response = self._hrc.get_tokens()
-        self.tokens = response.root
+        self._tokens = response.root
         return self.tokens
 
-    def load_direct_routes(self) -> list[models.DirectRoutesResponseItem]:
+    @property
+    def routes(self) -> list[models.DirectRoutesResponseItem]:
+        if not self._routes:
+            self._routes = self._load_routes()
+        return self._routes
+
+    def _load_routes(self) -> list[models.DirectRoutesResponseItem]:
         response = self._hrc.get_direct_routes()
-        self.direct_routes = response.root
-        return self.direct_routes
+        self._routes = response.root
+        return self._routes
 
-    def load_fees(self) -> list[models.FeesResponseItem]:
+    @property
+    def fees(self) -> list[models.FeesResponseItem]:
+        if not self._fees:
+            self._fees = self._load_fees()
+        return self._fees
+
+    def _load_fees(self) -> list[models.FeesResponseItem]:
         response = self._hrc.get_fees()
-        self.fees = response.fees
-        # self._fees_updated_at = response.updatedAt
-        return self.fees
+        self._fees = response.fees
+        return self._fees
 
-    def load_swap_limits(self) -> list[models.SwapLimitsResponseSchemaItem]:
+    @property
+    def swap_limits(self) -> list[models.SwapLimitsResponseSchemaItem]:
+        if not self._swap_limits:
+            self._swap_limits = self._load_swap_limits()
+        return self._swap_limits
+
+    def _load_swap_limits(self) -> list[models.SwapLimitsResponseSchemaItem]:
         response = self._hrc.get_swap_limits()
-        self.swap_limits = response.root
-        return self.swap_limits
+        self._swap_limits = response.root
+        return self._swap_limits
 
-    def load_swap_durations(self) -> list[models.SwapDurationsResponseSchemaItem]:
+    @property
+    def swap_durations(self) -> list[models.SwapDurationsResponseSchemaItem]:
+        if not self._swap_durations:
+            self._swap_durations = self._load_swap_durations()
+        return self._swap_durations
+
+    def _load_swap_durations(self) -> list[models.SwapDurationsResponseSchemaItem]:
         response = self._hrc.get_swap_durations()
-        self.swap_durations = response.root
-        return self.swap_durations
+        self._swap_durations = response.root
+        return self._swap_durations
 
     def close(self) -> None:
         """Close the HTTP client."""
