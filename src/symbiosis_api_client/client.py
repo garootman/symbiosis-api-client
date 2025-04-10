@@ -31,6 +31,18 @@ class SymbiosisApiClient:
         self._swap_limits: list[models.SwapLimitsResponseSchemaItem] = []
         self._swap_durations: list[models.SwapDurationsResponseSchemaItem] = []
         self._swap_configs: list[models.SwapConfigsResponseItem] = []
+        self._swap_tiers: list[models.SwapDiscountTiersResponseSchemaItem] = []
+
+    @property
+    def swap_tiers(self) -> list[models.SwapDiscountTiersResponseSchemaItem]:
+        if not self._swap_tiers:
+            self._swap_tiers = self._load_swap_tiers()
+        return self._swap_tiers
+
+    def _load_swap_tiers(self) -> list[models.SwapDiscountTiersResponseSchemaItem]:
+        response = self._hrc.get_swap_tiers()
+        self._swap_tiers = response.root
+        return self._swap_tiers
 
     @property
     def swap_configs(self) -> list[models.SwapConfigsResponseItem]:

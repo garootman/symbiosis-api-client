@@ -93,3 +93,16 @@ def test_load_swap_configs(client):
     )
     assert client._swap_configs == swap_configs
     assert client.swap_configs == swap_configs
+
+
+def test_load_swap_tiers(client):
+    assert client._swap_tiers == []
+    swap_tiers = client._load_swap_tiers()
+    assert len(swap_tiers) > 5
+    assert isinstance(swap_tiers, list)
+    assert all(
+        isinstance(tier, models.SwapDiscountTiersResponseSchemaItem)
+        for tier in client._swap_tiers
+    )
+    assert client._swap_tiers == swap_tiers
+    assert client.swap_tiers == swap_tiers

@@ -821,3 +821,27 @@ class SwapConfigsResponseItem(BaseModel):
 
 class SwapConfigsResponseSchema(RootModel[List[SwapConfigsResponseItem]]):
     pass
+
+
+class SwapDiscountTiersResponseSchemaItem(BaseModel):
+    amount: int
+    discount: int
+
+    @field_validator("amount", mode="before")
+    @classmethod
+    def check_value(cls, v):
+        num = to_number(v)
+        if num is None:
+            raise ValueError(f"Value {v} is not a number")
+        return int(num)
+
+    @field_serializer("amount")
+    @classmethod
+    def serialize_amount(cls, v):
+        return str(v)
+
+
+class SwapDiscountTiersResponseSchema(
+    RootModel[List[SwapDiscountTiersResponseSchemaItem]]
+):
+    pass

@@ -115,6 +115,12 @@ class HttpxRequestClient:
         response.raise_for_status()
         return models.SwapConfigsResponseSchema.model_validate(response.json())
 
+    def get_swap_tiers(self):
+        """Returns the swap tiers for supported blockchain networks."""
+        response = self.client.get("/calculations/v1/swap/discount/tiers")
+        response.raise_for_status()
+        return models.SwapDiscountTiersResponseSchema.model_validate(response.json())
+
     def get_stucked(
         self, payload: models.StuckedRequestSchema
     ) -> models.StuckedResponseSchema:

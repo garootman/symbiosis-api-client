@@ -15,3 +15,9 @@ def test_client_get_swap_configs(client):
     swap_config = client.get_swap_configs()
     assert isinstance(swap_config, models.SwapConfigsResponseSchema)
     assert len(swap_config.root) > 20
+
+
+def test_get_swap_tiers(client):
+    swap_tiers = client.get_swap_tiers()
+    assert isinstance(swap_tiers, models.SwapDiscountTiersResponseSchema)
+    assert len(swap_tiers.root) > 0
