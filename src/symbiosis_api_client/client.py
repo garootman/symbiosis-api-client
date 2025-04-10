@@ -16,13 +16,11 @@ class SymbiosisApiClient:
         self,
         base_url: str | None = None,
         httpx_client: httpx.Client | None = None,
-        timeout: float = 10.0,
     ) -> None:
         """Initialize the Symbiosis API client."""
         self._hrc = HttpxRequestClient(
             base_url=base_url,
             httpx_client=httpx_client,
-            timeout=timeout,
         )
         self._hrc.health_check(raise_exception=True)
 

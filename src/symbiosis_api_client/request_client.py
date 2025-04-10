@@ -27,7 +27,6 @@ class HttpxRequestClient:
         self,
         base_url: str | None = None,
         httpx_client: Optional[httpx.Client] = None,
-        timeout: float = 10.0,
     ) -> None:
         """Initialize the SymbiosisAPI client, singleton + rate limiting."""
         if base_url is None:
@@ -40,7 +39,7 @@ class HttpxRequestClient:
             httpx_client = httpx.Client(
                 base_url=base_url,
                 transport=transport,
-                timeout=timeout,
+                timeout=10.0,
                 headers={
                     "accept": "application/json",
                     "Content-Type": "application/json",
