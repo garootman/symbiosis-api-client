@@ -80,3 +80,16 @@ def test_load_swap_durations(client):
     )
     assert client._swap_durations == swap_durations
     assert client.swap_durations == swap_durations
+
+
+def test_load_swap_configs(client):
+    assert client._swap_configs == []
+    swap_configs = client._load_swap_configs()
+    assert len(swap_configs) > 20
+    assert isinstance(swap_configs, list)
+    assert all(
+        isinstance(config, models.SwapConfigsResponseItem)
+        for config in client._swap_configs
+    )
+    assert client._swap_configs == swap_configs
+    assert client.swap_configs == swap_configs

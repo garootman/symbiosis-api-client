@@ -30,6 +30,18 @@ class SymbiosisApiClient:
         self._fees: list[models.FeesResponseItem] = []
         self._swap_limits: list[models.SwapLimitsResponseSchemaItem] = []
         self._swap_durations: list[models.SwapDurationsResponseSchemaItem] = []
+        self._swap_configs: list[models.SwapConfigsResponseItem] = []
+
+    @property
+    def swap_configs(self) -> list[models.SwapConfigsResponseItem]:
+        if not self._swap_configs:
+            self._swap_configs = self._load_swap_configs()
+        return self._swap_configs
+
+    def _load_swap_configs(self) -> list[models.SwapConfigsResponseItem]:
+        response = self._hrc.get_swap_configs()
+        self._swap_configs = response.root
+        return self._swap_configs
 
     @property
     def chains(self) -> list[models.ChainsResponseSchemaItem]:

@@ -796,3 +796,28 @@ class DirectRoutesResponseItem(BaseModel):
 
 class DirectRoutesResponse(RootModel[List[DirectRoutesResponseItem]]):
     pass
+
+
+class SwapToken(BaseModel):
+    address: str
+    fee_rounding: int
+    decimals: int
+    symbol: str
+    total_limit: int | None = None
+    tx_limit: int | None = None
+
+
+class SwapPortal(BaseModel):
+    address: str
+    tokens: List[SwapToken]
+
+
+class SwapConfigsResponseItem(BaseModel):
+    chain_id: int
+    fee: int
+    portal: Optional[SwapPortal]
+    block_indent: int
+
+
+class SwapConfigsResponseSchema(RootModel[List[SwapConfigsResponseItem]]):
+    pass
