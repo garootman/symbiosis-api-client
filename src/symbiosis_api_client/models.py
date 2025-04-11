@@ -239,8 +239,12 @@ class SelectMode(str, Enum):
 class SwapRequestSchema(BaseModel):
     tokenAmountIn: TokenAmountIn
     tokenOut: TokenOut
-    from_: Address = Field(..., alias="from")
-    to: Address
+    from_: Address | str = Field(..., alias="from")  # type: ignore
+    to: Address | str
+    # Address types replaced with STR because there are
+    # many types blockchain addresses, which are not
+    # represented in the Address type now.
+    # TODO: Add all address types to the Address type
     slippage: int
     middlewareCall: Optional[MiddlewareCall] = None
     revertableAddresses: Optional[List[RevertableAddress]] = None
