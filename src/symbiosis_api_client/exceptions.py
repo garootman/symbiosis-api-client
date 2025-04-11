@@ -22,3 +22,8 @@ class SwapRoutNotExist(Exception): ...
 class InvalidCommit(Exception):
     def __init__(self, message: str) -> None:
         super().__init__(message)
+
+
+class SwapCreationError(Exception):
+    def __init__(self, message: str) -> None:
+        super().__init__(message)

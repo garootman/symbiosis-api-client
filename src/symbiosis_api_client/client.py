@@ -2,6 +2,11 @@
 
 import logging
 
+from symbiosis_api_client.check_latest_commit import check_latest_commit
+
+from . import exceptions as excep
+from .load_static_chain_data import load_static_config, models_static
+from .model_adapter import ModelsAdapter
 from .request_client import HttpxRequestClient, httpx, models
 
 logger = logging.getLogger("SymbiosisAPIClient")
@@ -23,6 +28,7 @@ class SymbiosisApiClient:
             httpx_client=httpx_client,
         )
         self._hrc.health_check(raise_exception=True)
+        self._verify_mainnet_commit()
 
         self._chains: list[models.ChainsResponseSchemaItem] = []
         self._tokens: list[models.TokensResponseSchemaItem] = []
@@ -33,6 +39,13 @@ class SymbiosisApiClient:
         self._swap_configs: list[models.SwapConfigsResponseItem] = []
         self._swap_tiers: list[models.SwapDiscountTiersResponseSchemaItem] = []
         self._swap_chains: list[int] = []
+
+        static_cfg = load_static_config()
+        self._static_chains: list[models_static.StaticChain] = static_cfg.chains
+
+    def _verify_mainnet_commit(self) -> None:
+        if not check_latest_commit(client=self._hrc.client):
+            raise excep.InvalidCommit("Addresses are updated, please update client!")
 
     @property
     def swap_chains(self) -> list[int]:
@@ -144,7 +157,10 @@ class SymbiosisApiClient:
         self._hrc.close()
 
     def _lookup_chain(
-        self, chain_name: str | None = None, chain_id: int | None = None
+        self,
+        chain_name: str | None = None,
+        chain_id: int | None = None,
+        raise_exception: bool = False,
     ) -> models.ChainsResponseSchemaItem | None:
         if chain_name is None and chain_id is None:
             raise ValueError("Either chain_name or chain_id must be provided.")
@@ -158,10 +174,13 @@ class SymbiosisApiClient:
             for item in self.chains:
                 if item.id == chain_id:
                     return item
+        logger.warning("Chain not found: %s", chain_name or chain_id)
+        if raise_exception:
+            raise excep.ChainNotFound(f"Chain not found: {chain_name or chain_id}")
         return None
 
     def _lookup_token(
-        self, symbol: str, chainId: int
+        self, symbol: str, chainId: int, raise_exception: bool = False
     ) -> models.TokensResponseSchemaItem | None:
         chain = self._lookup_chain(chain_id=chainId)
         if chain is None:
@@ -169,21 +188,105 @@ class SymbiosisApiClient:
         for item in self.tokens:
             if item.symbol == symbol and item.chainId == chain.id:
                 return item
+        logger.warning("Token not found: %s on chain %s", symbol, chain.name)
+        if raise_exception:
+            raise excep.TokenNotFound(
+                f"Token not found: {symbol} on chain {chain.name}"
+            )
         return None
 
-    def _get_token_usd_price(self, token: str) -> float | None:
-        """Get the USD price of a token."""
-        raise NotImplementedError
-
-    def new_swap(
+    def _lookup_static_chain(
         self,
-        from_chain: str,
-        to_chain: str,
-        from_token: str,
-        to_token: str,
-        amount: float,
-        recipient: str,
-    ):
-        """Create a new swap."""
+        chain_id: int,
+        raise_exception: bool = False,
+    ) -> models_static.StaticChain | None:
+        for item in self._static_chains:
+            if item.id == chain_id:
+                return item
+        msg = f"Static chain not found: {chain_id}"
+        logger.warning(msg)
+        if raise_exception:
+            raise excep.ChainNotFound(msg)
+        return None
 
-    pass
+    def _lookup_static_token(
+        self, symbol, chainobj: models_static.StaticChain, raise_exception: bool = False
+    ) -> models_static.Stable | None:
+        for item in chainobj.stables:
+            if item.symbol == symbol:
+                return item
+        msg = f"Static token not found: {symbol} on chain {chainobj.rpc}"
+        logger.warning(msg)
+        if raise_exception:
+            raise excep.TokenNotFound(msg)
+        return None
+
+    def create_swap(
+        self,
+        chain_from: str,
+        token_from: str,
+        chain_to: str,
+        token_to: str,
+        amount: float,
+        sender: str,
+        recipient: str,
+        slippage: int = 200,
+        raise_exception: bool = False,
+    ) -> models.SwapResponseSchema | None:
+        """Create a swap request."""
+
+        chain_from_obj = self._lookup_chain(
+            chain_name=chain_from, raise_exception=raise_exception
+        )
+        chain_to_obj = self._lookup_chain(
+            chain_name=chain_to, raise_exception=raise_exception
+        )
+        if not chain_from_obj or not chain_to_obj:
+            return None
+
+        static_chain_from_obj = self._lookup_static_chain(
+            chain_id=chain_from_obj.id, raise_exception=raise_exception
+        )
+
+        static_chain_to_obj = self._lookup_static_chain(
+            chain_id=chain_to_obj.id, raise_exception=raise_exception
+        )
+
+        if not static_chain_from_obj or not static_chain_to_obj:
+            return None
+
+        static_token_from_obj = self._lookup_static_token(
+            symbol=token_from,
+            chainobj=static_chain_from_obj,
+            raise_exception=raise_exception,
+        )
+
+        static_token_to_obj = self._lookup_static_token(
+            symbol=token_to,
+            chainobj=static_chain_to_obj,
+            raise_exception=raise_exception,
+        )
+
+        if not static_token_from_obj or not static_token_to_obj:
+            return None
+
+        payload = ModelsAdapter.create_swap_request_payload(
+            chain_from_obj=static_chain_from_obj,
+            chain_to_obj=static_chain_to_obj,
+            token_from_obj=static_token_from_obj,
+            token_to_obj=static_token_to_obj,
+            amount=amount,
+            sender=sender,
+            recipient=recipient,
+            slippage=slippage,
+        )
+        try:
+            resp = self._hrc.post_swap(payload)
+            logger.info("Swap created successfully: %s", resp)
+            return resp
+        except Exception as e:
+            logger.error("Error creating swap: %s", e)
+            if raise_exception:
+                msg = f"Error creating swap: {e}"
+                raise excep.SwapCreationError(msg)
+            return None

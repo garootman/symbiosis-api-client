@@ -17,8 +17,7 @@ def check_latest_commit(
     if client is None:
         client = httpx.Client()
     response = client.get(url)
-    if response.status_code != 200:
-        raise Exception(f"Failed to fetch data: {response.status_code}")
+    response.raise_for_status()
     data = response.json()
     if not isinstance(data, list):
         raise ValueError("Expected a list of commits")
