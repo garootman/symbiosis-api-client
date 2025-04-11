@@ -2,8 +2,6 @@ import pytest
 
 from symbiosis_api_client import SymbiosisApiClient, models
 
-m = models.SwapDiscountTiersResponseSchema
-
 
 @pytest.fixture
 def client():

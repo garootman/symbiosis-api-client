@@ -141,7 +141,7 @@ class HttpxRequestClient:
 
         To get chain's carrier token price, leave address empty.
         """
-        payload_dump = payload.model_dump(exclude_none=True)
+        payload_dump = payload.model_dump(exclude_none=True, by_alias=True)
         response = self.client.post("/calculations/v1/token/price", json=payload_dump)
         response.raise_for_status()
         return models.TokenPriceResponseSchema.model_validate(response.json())
@@ -172,7 +172,7 @@ class HttpxRequestClient:
         :return: The response from the Symbiosis Finance API.
         """
 
-        payload_dump = payload.model_dump(exclude_none=True)
+        payload_dump = payload.model_dump(exclude_none=True, by_alias=True)
         response = self.client.post("/crosschain/v1/swap", json=payload_dump)
         response.raise_for_status()
         return models.SwapResponseSchema.model_validate(response.json())
@@ -188,7 +188,7 @@ class HttpxRequestClient:
         :param payload: The payload containing the revert details.
         :return: The response from the Symbiosis Finance API.
         """
-        payload_dump = payload.model_dump(exclude_none=True)
+        payload_dump = payload.model_dump(exclude_none=True, by_alias=True)
         response = self.client.post("/crosschain/v1/revert", json=payload_dump)
         response.raise_for_status()
         return models.RevertResponseSchema.model_validate(response.json())
@@ -201,7 +201,7 @@ class HttpxRequestClient:
         Works the same way as /v1/tx, but accepts an array of { chainId, transactionHash }
         pairs to check the status of several operations at once.
         """
-        payload_dump = payload.model_dump(exclude_none=True)
+        payload_dump = payload.model_dump(exclude_none=True, by_alias=True)
         response = self.client.post("/crosschain/v1/batch-tx", json=payload_dump)
         response.raise_for_status()
         return models.BatchTxResponseSchema.model_validate(response.json())
@@ -219,7 +219,7 @@ class HttpxRequestClient:
         :return: The response from the Symbiosis Finance API.
         """
 
-        payload_dump = payload.model_dump(exclude_none=True)
+        payload_dump = payload.model_dump(exclude_none=True, by_alias=True)
         response = self.client.post(
             "/crosschain/v1/zapping/exact_in", json=payload_dump
         )
