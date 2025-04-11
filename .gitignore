@@ -28,6 +28,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+jsondata/
+
 .python-version
 
 *.temp
