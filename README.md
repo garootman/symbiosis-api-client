@@ -1,6 +1,8 @@
 # symbiosis-client-py
 
-Python client for [Symbiosis Finance](https://symbiosis.finance/) REST API
+- Python client for [Symbiosis Finance](https://symbiosis.finance/) REST API
+- Client relies on [JS SDK ](https://github.com/symbiosis-finance/js-sdk) in part of  [configuration file](https://github.com/symbiosis-finance/js-sdk/blob/main/src/crosschain/config/mainnet.ts). If there is a new commit, Client will raise `InvalidCommit`
+
 
 ## ToDo Plan:
 
@@ -20,7 +22,7 @@ Python client for [Symbiosis Finance](https://symbiosis.finance/) REST API
 
 - [Swagger](https://api.symbiosis.finance/crosschain/docs/)
 - [Source Docs](https://docs.symbiosis.finance/developer-tools/symbiosis-api)
-- [JS SDK Source code for reference](https://github.com/symbiosis-finance/js-sdk)
+-
 
 
 

@@ -1,6 +1,6 @@
 from symbiosis_api_client.check_latest_commit import check_latest_commit
 from symbiosis_api_client.load_static_chain_data import (
-    load_static_chains,
+    load_static_config,
     models_static,
 )
 
@@ -12,7 +12,7 @@ def test_latest_commit():
     assert check_latest_commit() is True
 
 
-def test_load_static_chains():
+def test_load_static_config():
     """Test that the static chains are loaded correctly."""
-    data = load_static_chains()
+    data = load_static_config()
     assert isinstance(data, models_static.StaticConfigModel)

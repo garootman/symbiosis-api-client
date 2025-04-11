@@ -38,7 +38,7 @@ class Stable(BaseModel):
     deprecated: Optional[bool] = None
 
 
-class Chain(BaseModel):
+class StaticChain(BaseModel):
     id: int
     rpc: str
     filterBlockOffset: int
@@ -63,4 +63,4 @@ class StaticConfigModel(BaseModel):
     omniPools: List[OmniPool]
     revertableAddress: RevertableAddress
     refundAddress: str
-    chains: List[Chain]
+    chains: List[StaticChain]

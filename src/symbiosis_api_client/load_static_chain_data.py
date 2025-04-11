@@ -6,7 +6,7 @@ import os
 from . import static_models as models_static
 
 
-def load_static_chains(filepath: str | None = None) -> models_static.StaticConfigModel:
+def load_static_config(filepath: str | None = None) -> models_static.StaticConfigModel:
     """Load static chains from mainnet.json."""
     # Load the static data from the JSON file
     if filepath is None:
