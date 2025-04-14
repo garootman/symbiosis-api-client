@@ -270,6 +270,20 @@ class SymbiosisApiClient:
         if not static_token_from_obj or not static_token_to_obj:
             return None
 
+        token_from_obj = self._lookup_token(
+            symbol=token_from,
+            chainId=chain_from_obj.id,
+            raise_exception=raise_exception,
+        )
+
+        token_to_obj = self._lookup_token(
+            symbol=token_to,
+            chainId=chain_to_obj.id,
+            raise_exception=raise_exception,
+        )
+        if not token_from_obj or not token_to_obj:
+            pass
+
         payload = ModelsAdapter.create_swap_request_payload(
             chain_from_obj=static_chain_from_obj,
             chain_to_obj=static_chain_to_obj,

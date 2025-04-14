@@ -1,7 +1,20 @@
-# symbiosis-client-py
+[![PyPI - Version](https://img.shields.io/pypi/v/symbiosis-api-client.svg)](https://pypi.org/project/symbiosis-api-client) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/symbiosis-api-client.svg)](https://pypi.org/project/symbiosis-api-client)
+
+
+# Symbiosis API Client
+
+### Installation
+
+```console
+pip install symbiosis-api-client
+```
+
+## Some Info
 
 - Python syncronous client for [Symbiosis Finance](https://symbiosis.finance/) REST API
 - Client relies on [JS SDK ](https://github.com/symbiosis-finance/js-sdk) in part of  [configuration file](https://github.com/symbiosis-finance/js-sdk/blob/main/src/crosschain/config/mainnet.ts). If there is a new commit, Client will raise `InvalidCommit`
+- Partial [Symbiosis Swagger](https://api.symbiosis.finance/crosschain/docs/), not much info
+- [Symbiosis API Docs](https://docs.symbiosis.finance/developer-tools/symbiosis-api), what and why
 
 
 ## ToDo Plan:
@@ -17,35 +30,22 @@
 - [X] Exception Codes
 - [X] tox for Python versions
 - [X] Pydantic models
-- [ ] Test Stuck transactions functionality
+- [ ] Test Stuck transactions functionality, [docs here](https://docs.symbiosis.finance/crosschain-liquidity-engine/symbiosis-and-emergencies)
 - [ ] Testnet – when there are tokens available on Symbiosis
 - [ ] Async client maybe?
 
-
-
-### Sources:
-
-- [Swagger](https://api.symbiosis.finance/crosschain/docs/)
-- [Source Docs](https://docs.symbiosis.finance/developer-tools/symbiosis-api)
-
-
-# symbiosis-api-client
-
-[![PyPI - Version](https://img.shields.io/pypi/v/symbiosis-api-client.svg)](https://pypi.org/project/symbiosis-api-client)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/symbiosis-api-client.svg)](https://pypi.org/project/symbiosis-api-client)
 
 -----
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [License](#license)
+- [Symbiosis API Client](#symbiosis-api-client)
+    - [Installation](#installation)
+  - [Some Info](#some-info)
+  - [ToDo Plan:](#todo-plan)
+  - [Table of Contents](#table-of-contents)
+  - [License](#license)
 
-## Installation
-
-```console
-pip install symbiosis-api-client
-```
 
 ## License
 
