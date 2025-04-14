@@ -221,6 +221,18 @@ class SymbiosisApiClient:
             raise excep.TokenNotFound(msg)
         return None
 
+    def get_txn_status(
+        self, chain_name: str, txn_hash: str
+    ) -> models.TxResponseSchema | None:
+        chain_obj = self._lookup_chain(chain_name=chain_name)
+        if not chain_obj:
+            return None
+        tx = models.Tx12(
+            transactionHash=txn_hash,
+            chainId=chain_obj.id,
+        )
+        return self._hrc.get_transaction(tx)
+
     def create_swap(
         self,
         chain_from: str,

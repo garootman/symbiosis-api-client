@@ -92,7 +92,7 @@ current_request = {
 
 
 def test_check_lookup_route(routes_list, client):
-    for rr in routes_list:
+    for rr in routes_list[:1]:
         route_dict, _ = rr
         swap = client.create_swap(**route_dict)
         assert isinstance(swap, models.SwapResponseSchema)

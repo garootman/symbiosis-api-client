@@ -643,7 +643,7 @@ class TokenAmount(BaseModel):
 
 class StuckedResponseSchemaItem(BaseModel):
     hash: str
-    chainId: float
+    chainId: int
     createdAt: str
     tokenAmount: TokenAmount
 
@@ -654,7 +654,7 @@ class StuckedResponseSchema(RootModel[List[StuckedResponseSchemaItem]]):
 
 class RevertRequestSchema(BaseModel):
     transactionHash: str
-    chainId: float
+    chainId: int
 
 
 class Tx10(BaseModel):
@@ -712,8 +712,8 @@ class Status(BaseModel):
 class Tx11(BaseModel):
     hash: str
     chainId: int
-    tokenAmount: TokenAmount
-    time: str
+    tokenAmount: TokenAmount | None
+    time: str | None
     address: str
 
 
@@ -757,7 +757,7 @@ class TxResponseSchema(BaseModel):
 
 class Tx12(BaseModel):
     transactionHash: str
-    chainId: float
+    chainId: int
 
 
 class BatchTxRequestSchema(BaseModel):
@@ -766,7 +766,7 @@ class BatchTxRequestSchema(BaseModel):
 
 class Tx13(BaseModel):
     hash: str
-    chainId: float
+    chainId: int
     tokenAmount: TokenAmount
     time: str
     address: str
@@ -774,7 +774,7 @@ class Tx13(BaseModel):
 
 class TxIn1(BaseModel):
     hash: str
-    chainId: float
+    chainId: int
     tokenAmount: TokenAmount
     time: str
     address: str
