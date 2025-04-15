@@ -8,7 +8,9 @@ class ModelsAdapter:
     def create_token_out(token_to_obj: static_models.Stable) -> models.TokenOut:
         """Creates a TokenOut object from a static token object."""
         return models.TokenOut(
-            address="",
+            # address="", it was like this in the original code. #
+            # TODO: check for ethereum -> tron txn
+            address=token_to_obj.address,
             chainId=token_to_obj.chainId,
             decimals=token_to_obj.decimals,
             symbol=token_to_obj.symbol,

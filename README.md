@@ -19,12 +19,12 @@ pip install symbiosis-api-client
 
 ## ToDo Plan:
 
-
 - [ ] Cover routes:
   - [X] Eth USDT -> Tron USDT
-  - [ ] Eth USDT -> TON USDT
+  - [X] Eth USDT -> TON USDT
   - [ ] BSC DAI -> Tron TRX
   - [ ] TON TON -> BSC BNB
+- [ ] Make BaseSwap full logic replica
 - [X] Main functionality
 - [X] Rate limit + Singleton
 - [X] Exception Codes
