@@ -76,7 +76,7 @@ build: venv
 
 # Publish package
 publish: venv
-	$(UV) publish
+	hatch publish
 
 # Run tox tests
 tox: venv
