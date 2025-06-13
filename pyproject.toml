@@ -64,6 +64,19 @@ tests = ["tests", "*/symbiosis-api-client/tests"]
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
+[project.optional-dependencies]
+dev = [
+  "bandit>=1.7.10",
+  "black>=24.8.0",
+  "mypy>=1.14.1",
+  "pre-commit>=3.5.0",
+  "pytest>=8.3.5",
+  "ruff>=0.11.4",
+  "sphinx>=7.1.2",
+  "tox>=4.25.0",
+  "twine>=6.1.0",
+]
+
 [dependency-groups]
 dev = [
   "bandit>=1.7.10",

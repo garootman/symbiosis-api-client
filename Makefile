@@ -1,40 +1,83 @@
-.PHONY: lint format typecheck security check-all docs html clean test build publish
+# Python executable and venv paths
+PYTHON := python3
+VENV := .venv
+VENV_PYTHON := $(VENV)/bin/python
+VENV_PIP := $(VENV)/bin/pip
+UV := uv
 
-lint:
-	pre-commit run ruff --all-files
+.PHONY: venv install install-dev sync lint format typecheck security check-all docs html clean test build publish tox
 
-format:
-	pre-commit run black --all-files
+# Create virtual environment
+venv:
+	@if [ ! -d "$(VENV)" ]; then \
+		echo "Creating virtual environment..."; \
+		$(UV) venv $(VENV); \
+	else \
+		echo "Virtual environment already exists."; \
+	fi
 
-typecheck:
-	pre-commit run mypy --all-files
+# Install project dependencies only (fresh install)
+install: venv
+	$(UV) pip install --force-reinstall -e .
 
-security:
-	pre-commit run bandit --all-files
+# Install development dependencies (fresh install)
+install-dev: venv
+	$(UV) pip install --force-reinstall -e .[dev]
+	$(UV) run pre-commit install
 
-check-all:
-	pre-commit run --all-files
+# Sync all dependencies using uv (clean sync)
+sync: venv
+	$(UV) sync --all-groups --refresh
 
-docs:
-	sphinx-build -b html docs/ docs/_build
+# Run ruff linter
+lint: venv
+	$(UV) run ruff check src/ tests/
+	$(UV) run ruff format --check src/ tests/
+
+# Format code with ruff
+format: venv
+	$(UV) run ruff format src/ tests/
+	$(UV) run ruff check --fix src/ tests/
+
+# Run type checking with mypy
+typecheck: venv
+	$(UV) run mypy src/symbiosis_api_client tests
+
+# Run security checks with bandit
+security: venv
+	$(UV) run bandit -r src/ --skip B101
+
+# Run all checks using pre-commit
+check-all: venv
+	$(UV) run pre-commit run --all-files
+
+# Build documentation
+docs: venv
+	$(UV) run sphinx-build -b html docs/ docs/_build
 
 # Open the generated HTML documentation in a web browser
 html: docs
 	open docs/_build/index.html
 
-# Clean up build artifacts
+# Clean up build artifacts and virtual environment
 clean:
-	rm -rf dist/ docs/_build/ *.egg-info
+	rm -rf dist/ docs/_build/ *.egg-info build/
+	rm -rf $(VENV)
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
 
 # Run tests using pytest
-test:
-	PYTHONPATH=src pytest
+test: venv
+	PYTHONPATH=src $(UV) run pytest tests/ -v
 
-build:
-	uv build
+# Build package
+build: venv
+	$(UV) build
 
-publish:
-	uv publish
+# Publish package
+publish: venv
+	$(UV) publish
 
-tox:
-	tox -e py310,py311,py312,py313,lint
+# Run tox tests
+tox: venv
+	$(UV) run tox -e py310,py311,py312,py313,lint

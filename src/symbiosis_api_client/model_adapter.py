@@ -3,7 +3,6 @@ from . import static_models as static_models
 
 
 class ModelsAdapter:
-
     @staticmethod
     def create_token_out(token_to_obj: static_models.Stable) -> models.TokenOut:
         """Creates a TokenOut object from a static token object."""
@@ -52,7 +51,7 @@ class ModelsAdapter:
         mm = models.SwapRequestSchema(
             tokenAmountIn=tokin,
             tokenOut=tokout,
-            from_=sender,  # type: ignore[assignment]
+            from_=sender,  # type: ignore[call-arg]
             to=recipient,
             slippage=slippage,
             middlewareCall=None,
