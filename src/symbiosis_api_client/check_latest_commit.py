@@ -1,7 +1,7 @@
 import httpx
 
 URL = "https://api.github.com/repos/symbiosis-finance/js-sdk/commits?path=src/crosschain/config/mainnet.ts&sha=main"
-TARGET_COMMIT = "4a9a96064a8178f43e4b729f96763450041698e0"
+TARGET_COMMIT = "514a13f9465906d95617e65a65e1c148cffa614a"
 
 
 def check_latest_commit(
